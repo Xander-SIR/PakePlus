@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>瑞泽净化 · 全国业绩地图管理系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', 'PingFang SC', 'Roboto', sans-serif; background: #e8f0f5; padding: 16px; }
+        .app-container { max-width: 1600px; margin: 0 auto; background: white; border-radius: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #0a4c6e 0%, #0b5a7a 100%); padding: 20px 32px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .header h1 { font-size: 1.6rem; display: flex; align-items: center; gap: 12px; }
+        .admin-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 8px 20px; border-radius: 40px; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; }
+        .admin-btn:hover { background: rgba(255,255,255,0.3); }
+        .admin-status { font-size: 0.75rem; background: rgba(255,255,255,0.15); padding: 4px 12px; border-radius: 20px; margin-left: 12px; }
+        .logout-btn { background: rgba(255,255,255,0.15); border: none; padding: 4px 12px; border-radius: 20px; cursor: pointer; margin-left: 8px; font-size: 0.7rem; color: #ffd966; }
+        .logout-btn:hover { background: rgba(255,255,255,0.25); }
+        .product-categories { background: #f4f9fe; padding: 12px 28px; border-bottom: 1px solid #dce5ec; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .cat-label { font-weight: 600; color: #1e5a7a; }
+        .cat-btn { background: white; border: 1px solid #cde0ea; padding: 6px 18px; border-radius: 40px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+        .cat-btn.active { background: #0b5a7a; border-color: #0b5a7a; color: white; }
+        .dashboard { display: flex; flex-wrap: wrap; padding: 24px; gap: 24px; }
+        .map-area { flex: 2; min-width: 400px; background: #f5f7fa; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        #baiduMap { width: 100%; height: 550px; }
+        .info-area { flex: 1.5; min-width: 350px; display: flex; flex-direction: column; gap: 20px; }
+        .detail-card { background: #ffffff; border-radius: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px; border: 1px solid #eef2f8; flex: 1; overflow-y: auto; max-height: 550px; }
+        .detail-header { border-bottom: 2px solid #e3eef5; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10; }
+        .province-title { font-size: 1.5rem; font-weight: 700; color: #0a4c6e; margin: 8px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .back-btn { background: #eef2fa; border: none; padding: 6px 14px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; color: #0b5a7a; }
+        .metric-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #e9f0f5; }
+        .detail-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.8rem; }
+        .detail-table th, .detail-table td { border: 1px solid #e2edf2; padding: 8px 10px; text-align: left; }
+        .detail-table th { background: #f4f9fe; color: #1e5a7a; position: sticky; top: 50px; }
+        .company-count { font-size: 0.75rem; color: #5f8aa8; margin-top: 12px; text-align: center; }
+        footer { text-align: center; padding: 16px; font-size: 0.7rem; color: #7b9ab0; border-top: 1px solid #e2edf2; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 32px; width: 90%; max-width: 1000px; max-height: 85vh; overflow-y: auto; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #e3eef5; }
+        .modal-header h2 { color: #0a4c6e; }
+        .close-modal { font-size: 1.8rem; cursor: pointer; color: #999; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #1e5a7a; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1px solid #cde0ea; border-radius: 24px; font-size: 0.9rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .btn-submit { background: #0b5a7a; color: white; border: none; padding: 12px 24px; border-radius: 40px; cursor: pointer; font-size: 1rem; width: 100%; margin-top: 16px; }
+        .btn-submit:hover { background: #0a4c6e; }
+        .btn-export { background: #27ae60; }
+        .btn-export:hover { background: #219a52; }
+        .btn-json { background: #8e44ad; }
+        .btn-json:hover { background: #7d3c98; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.8rem; }
+        .data-table th, .data-table td { border: 1px solid #e2edf2; padding: 8px 12px; text-align: left; }
+        .data-table th { background: #f4f9fe; color: #1e5a7a; position: sticky; top: 0; }
+        .action-btn { background: none; border: none; cursor: pointer; margin: 0 4px; font-size: 1rem; }
+        .edit-btn { color: #f39c12; }
+        .delete-btn { color: #e74c3c; }
+        .tab-buttons { display: flex; gap: 12px; margin-bottom: 20px; border-bottom: 1px solid #e2edf2; padding-bottom: 12px; flex-wrap: wrap; }
+        .tab-btn { background: none; border: none; padding: 8px 20px; cursor: pointer; font-size: 0.9rem; border-radius: 40px; }
+        .tab-btn.active { background: #0b5a7a; color: white; }
+        .search-box { margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .search-box input, .search-box select { flex: 1; padding: 10px 14px; border: 1px solid #cde0ea; border-radius: 40px; min-width: 150px; }
+        .search-box button { padding: 10px 20px; background: #0b5a7a; color: white; border: none; border-radius: 40px; cursor: pointer; }
+        .search-box button:hover { background: #0a4c6e; }
+        .map-loading { display: flex; justify-content: center; align-items: center; height: 550px; background: #f5f7fa; color: #0a4c6e; flex-direction: column; gap: 12px; }
+        .password-input { margin-bottom: 20px; }
+        .password-input input { width: 100%; padding: 12px; border: 1px solid #cde0ea; border-radius: 24px; font-size: 1rem; }
+        .error-msg { color: #e74c3c; font-size: 0.8rem; margin-top: 8px; text-align: center; }
+        .info-window-content { padding: 8px; min-width: 180px; }
+        .info-window-content h4 { margin: 0 0 8px 0; color: #0a4c6e; }
+        .info-window-content p { margin: 4px 0; }
+        .info-window-content .detail-link { color: #0b5a7a; cursor: pointer; margin-top: 8px; display: inline-block; text-decoration: underline; }
+        .info-window-content .detail-link:hover { color: #e67e22; }
+        .no-data { text-align: center; padding: 40px; color: #999; }
+        .search-result-count { font-size: 0.75rem; color: #5f8aa8; margin-bottom: 10px; }
+        .export-buttons { display: flex; gap: 16px; margin-top: 20px; }
+        @media (max-width: 800px) {
+            #baiduMap { height: 400px; }
+            .form-row { grid-template-columns: 1fr; }
+            .dashboard { flex-direction: column; }
+            .map-area, .info-area { min-width: auto; }
+            .export-buttons { flex-direction: column; }
+        }
+    </style>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&ak=M5Jc5OiXavu61RpvSVt1NsC7aju1uI7a"></script>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <h1><i class="fas fa-industry"></i> 瑞泽净化 · 全国业绩地图管理系统</h1>
+        <div>
+            <button class="admin-btn" id="adminBtn" onclick="toggleAdminMode()">
+                <i class="fas fa-user-shield"></i> <span id="adminBtnText">管理员后台</span>
+            </button>
+            <span id="adminStatusBadge" style="display:none;" class="admin-status">👑 管理员模式</span>
+        </div>
+    </div>
+
+    <div class="product-categories" id="categoryContainer">
+        <span class="cat-label"><i class="fas fa-filter"></i> 产品系列：</span>
+    </div>
+
+    <div class="dashboard">
+        <div class="map-area"><div id="baiduMap"><div class="map-loading"><i class="fas fa-spinner fa-pulse" style="font-size: 2rem;"></i><p>地图加载中...</p></div></div></div>
+        <div class="info-area">
+            <div class="detail-card">
+                <div class="detail-header"><span><i class="fas fa-map-marker-alt"></i> 区域业绩详情</span><span style="font-size:0.7rem; background:#eef2fa; padding:4px 10px; border-radius:20px;"><i class="fas fa-mouse-pointer"></i> 点击地图标记点查看</span></div>
+                <div id="dynamicDetail"><div style="text-align:center; padding:60px 20px; color:#8aaec0;"><i class="fas fa-tap" style="font-size:3rem;"></i><p style="margin-top:16px;">点击地图上的红色标记点<br>选择"查看详情"查看完整销售明细</p></div></div>
+            </div>
+            <div class="detail-card" style="background:#fafdff;">
+                <div class="detail-header"><span><i class="fas fa-chart-pie"></i> 全国业绩概览</span><i class="fas fa-chart-line" style="color:#0b5a7a;"></i></div>
+                <div id="globalStats"><div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-pulse"></i> 加载数据中...</div></div>
+            </div>
+        </div>
+    </div>
+    <footer><i class="fas fa-database"></i> 数据持久化存储 | 管理员可自定义产品类型 | 关闭页面后自动退出登录</footer>
+</div>
+
+<!-- 管理员登录模态框 -->
+<div id="adminLoginModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header"><h2><i class="fas fa-lock"></i> 管理员登录</h2><span class="close-modal" onclick="closeAdminLogin()">&times;</span></div>
+        <div class="password-input"><input type="password" id="adminPassword" placeholder="请输入管理员密码" onkeypress="if(event.keyCode===13) checkAdminLogin()"></div>
+        <button class="btn-submit" onclick="checkAdminLogin()">登录</button>
+        <div id="loginError" class="error-msg"></div>
+    </div>
+</div>
+
+<!-- 管理员后台模态框 -->
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-cog"></i> 管理员后台 <span style="font-size:0.7rem; background:#eef2fa; padding:2px 10px; border-radius:20px; margin-left:10px;">管理员模式已启用</span></h2>
+            <span class="close-modal" onclick="closeAdminModal()">&times;</span>
+        </div>
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="switchTab('add')">➕ 添加业绩</button>
+            <button class="tab-btn" onclick="switchTab('edit')">✏️ 编辑/删除</button>
+            <button class="tab-btn" onclick="switchTab('list')">📋 数据列表</button>
+            <button class="tab-btn" onclick="switchTab('export')">📎 导出数据</button>
+            <button class="tab-btn" onclick="switchTab('typeManage')">🏷️ 产品类型管理</button>
+        </div>
+
+        <!-- 添加业绩 -->
+        <div id="addTab" class="tab-content">
+            <form id="addForm">
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-map-marker-alt"></i> 省份 *</label>
+                        <select id="addProvince" required>
+                            <option value="">请选择省份</option>
+                            <option value="北京市">北京市</option><option value="天津市">天津市</option>
+                            <option value="上海市">上海市</option><option value="重庆市">重庆市</option>
+                            <option value="河北省">河北省</option><option value="山西省">山西省</option>
+                            <option value="辽宁省">辽宁省</option><option value="吉林省">吉林省</option>
+                            <option value="黑龙江省">黑龙江省</option><option value="江苏省">江苏省</option>
+                            <option value="浙江省">浙江省</option><option value="安徽省">安徽省</option>
+                            <option value="福建省">福建省</option><option value="江西省">江西省</option>
+                            <option value="山东省">山东省</option><option value="河南省">河南省</option>
+                            <option value="湖北省">湖北省</option><option value="湖南省">湖南省</option>
+                            <option value="广东省">广东省</option><option value="广西壮族自治区">广西壮族自治区</option>
+                            <option value="海南省">海南省</option><option value="四川省">四川省</option>
+                            <option value="贵州省">贵州省</option><option value="云南省">云南省</option>
+                            <option value="西藏">西藏</option><option value="陕西省">陕西省</option>
+                            <option value="甘肃省">甘肃省</option><option value="青海省">青海省</option>
+                            <option value="宁夏回族自治区">宁夏回族自治区</option><option value="新疆维吾尔自治区">新疆维吾尔自治区</option>
+                            <option value="内蒙古自治区">内蒙古自治区</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label><i class="fas fa-tag"></i> 产品类型 *</label>
+                        <select id="addProductType" required></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-cube"></i> 产品型号/名称 *</label><input type="text" id="addProductName" required></div>
+                    <div class="form-group"><label><i class="fas fa-hashtag"></i> 销售数量 *</label><input type="number" id="addQty" min="1" required></div>
+                </div>
+                <div class="form-group"><label><i class="fas fa-building"></i> 客户名称</label><input type="text" id="addCompany"></div>
+                <button type="submit" class="btn-submit"><i class="fas fa-plus-circle"></i> 添加业绩记录</button>
+            </form>
+        </div>
+
+        <!-- 编辑删除 -->
+        <div id="editTab" class="tab-content" style="display:none;">
+            <div class="search-box">
+                <input type="text" id="editSearchProvince" placeholder="搜索省份...">
+                <input type="text" id="editSearchProduct" placeholder="搜索产品型号...">
+                <select id="editSearchType"></select>
+                <button onclick="loadEditList()">🔍 搜索</button>
+                <button onclick="resetEditSearch()" style="background:#6c757d;">重置</button>
+            </div>
+            <div id="editList"><p style="text-align:center; padding:20px;">加载数据中...</p></div>
+        </div>
+
+        <!-- 数据列表 -->
+        <div id="listTab" class="tab-content" style="display:none;">
+            <div class="search-box">
+                <input type="text" id="listSearchInput" placeholder="按省份、客户或产品搜索..." value="">
+                <button onclick="loadDataList()">🔍 搜索</button>
+                <button onclick="resetDataList()" style="background:#6c757d;">重置</button>
+            </div>
+            <div id="searchResultInfo" class="search-result-count"></div>
+            <div id="dataList" style="max-height: 450px; overflow-y: auto;"><p style="text-align:center; padding:20px;">加载数据中...</p></div>
+        </div>
+
+        <!-- 导出数据 -->
+        <div id="exportTab" class="tab-content" style="display:none;">
+            <div style="background:#eef2fa; padding:20px; border-radius:20px; margin-bottom:20px;">
+                <h4><i class="fas fa-info-circle"></i> 数据导出说明</h4>
+                <p style="font-size:0.85rem; margin-top:8px;">• <strong>导出 Excel (CSV)</strong>：导出为 CSV 格式，可用 Excel/WPS 打开，支持中文<br>
+                • <strong>导出 JSON</strong>：导出为 JSON 格式，适合数据备份或程序处理<br>
+                • 导出包含所有业绩记录（省份、客户、产品型号、数量、类型、录入日期）<br>
+                • 文件将自动下载到您的电脑</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-filter"></i> 筛选导出（可选）</label>
+                <select id="exportFilterType" style="width:100%;">
+                    <option value="all">全部类型</option>
+                </select>
+                <p style="font-size:0.7rem; color:#888; margin-top:5px;">选择特定产品类型后，只导出该类型的业绩数据</p>
+            </div>
+            
+            <div class="export-buttons">
+                <button class="btn-submit btn-export" onclick="exportToExcel()" style="margin-top:0;">
+                    <i class="fas fa-file-excel"></i> 导出 Excel (CSV) 文件
+                </button>
+                <button class="btn-submit btn-json" onclick="exportToJSON()" style="margin-top:0; background:#8e44ad;">
+                    <i class="fas fa-file-code"></i> 导出 JSON 文件
+                </button>
+            </div>
+            
+            <div style="margin-top:20px; padding:12px; background:#f8f9fa; border-radius:16px;">
+                <h5><i class="fas fa-chart-bar"></i> 当前数据统计</h5>
+                <div id="exportStats" style="font-size:0.8rem; margin-top:8px;"></div>
+            </div>
+        </div>
+
+        <!-- 产品类型管理 -->
+        <div id="typeManageTab" class="tab-content" style="display:none;">
+            <div style="background:#eef2fa; padding:16px; border-radius:20px; margin-bottom:20px;">
+                <h4><i class="fas fa-info-circle"></i> 使用说明</h4>
+                <p style="font-size:0.8rem; margin-top:8px;">• 添加/修改产品类型后，筛选栏和添加表单会自动更新<br>• 删除类型前请确保没有业绩记录使用该类型<br>• 修改类型名称后，对应业绩记录的类型也会同步更新</p>
+            </div>
+            <div class="form-row" style="margin-bottom:20px;">
+                <div class="form-group"><label><i class="fas fa-plus-circle"></i> 新类型名称</label><input type="text" id="newTypeName" placeholder="例: 二氧化碳纯化装置"></div>
+                <div class="form-group"><label><i class="fas fa-palette"></i> 图标(可选)</label><input type="text" id="newTypeIcon" placeholder="🔥 或 🧪 等emoji"></div>
+            </div>
+            <button class="btn-submit" onclick="addProductType()" style="margin-top:0;"><i class="fas fa-plus"></i> 添加新类型</button>
+            <h4 style="margin:24px 0 12px 0;"><i class="fas fa-list"></i> 现有产品类型</h4>
+            <div id="typeList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ADMIN_PASSWORD = "Ruize";
+    const SESSION_KEY = 'ruize_admin_logged_in';
+    
+    let salesDB = {};
+    let productTypes = [];
+    let currentFilter = "all";
+    let currentProvince = "广东省";
+    let map = null;
+    let markers = [];
+
+    // ================= 会话管理 =================
+    function isAdminLoggedIn() {
+        return sessionStorage.getItem(SESSION_KEY) === 'true';
+    }
+    
+    function setAdminLoggedIn(status) {
+        if (status) {
+            sessionStorage.setItem(SESSION_KEY, 'true');
+        } else {
+            sessionStorage.removeItem(SESSION_KEY);
+        }
+        updateAdminUI();
+    }
+    
+    function updateAdminUI() {
+        const isLoggedIn = isAdminLoggedIn();
+        const adminBtnText = document.getElementById('adminBtnText');
+        const adminStatusBadge = document.getElementById('adminStatusBadge');
+        
+        if (isLoggedIn) {
+            if (adminBtnText) adminBtnText.innerHTML = '👑 管理员模式 <span class="logout-btn" onclick="event.stopPropagation(); logout();">退出</span>';
+            if (adminStatusBadge) adminStatusBadge.style.display = 'inline-block';
+        } else {
+            if (adminBtnText) adminBtnText.innerHTML = '管理员后台';
+            if (adminStatusBadge) adminStatusBadge.style.display = 'none';
+        }
+    }
+    
+    function logout() {
+        setAdminLoggedIn(false);
+        closeAdminModal();
+        closeAdminLogin();
+        alert('已退出管理员模式');
+    }
+    
+    function toggleAdminMode() {
+        if (isAdminLoggedIn()) {
+            openAdminModal();
+        } else {
+            openAdminLogin();
+        }
+    }
+    
+    // ================= 产品类型管理 =================
+    function loadProductTypes() {
+        const saved = localStorage.getItem('ruize_productTypes');
+        if (saved) {
+            productTypes = JSON.parse(saved);
+        } else {
+            productTypes = [
+                { id: "type_1", name: "氩气纯化", icon: "🔥" },
+                { id: "type_2", name: "氮气纯化", icon: "💨" },
+                { id: "type_3", name: "氢气纯化", icon: "⚡" },
+                { id: "type_4", name: "氧气纯化", icon: "🫧" },
+                { id: "type_5", name: "混合配气", icon: "⚙️" },
+                { id: "type_6", name: "气体回收提纯", icon: "♻️" },
+                { id: "type_7", name: "其他气体", icon: "🧪" }
+            ];
+            saveProductTypes();
+        }
+        updateTypeSelectors();
+        renderCategoryButtons();
+        updateExportFilter();
+    }
+
+    function saveProductTypes() {
+        localStorage.setItem('ruize_productTypes', JSON.stringify(productTypes));
+    }
+
+    function updateTypeSelectors() {
+        const addTypeSelect = document.getElementById('addProductType');
+        const editSearchType = document.getElementById('editSearchType');
+        if (addTypeSelect) {
+            addTypeSelect.innerHTML = productTypes.map(t => `<option value="${t.name}">${t.icon || '📦'} ${t.name}</option>`).join('');
+        }
+        if (editSearchType) {
+            editSearchType.innerHTML = '<option value="">全部类型</option>' + productTypes.map(t => `<option value="${t.name}">${t.icon || '📦'} ${t.name}</option>`).join('');
+        }
+    }
+
+    function updateExportFilter() {
+        const exportFilter = document.getElementById('exportFilterType');
+        if (exportFilter) {
+            exportFilter.innerHTML = '<option value="all">全部类型</option>' + productTypes.map(t => `<option value="${t.name}">${t.icon || '📦'} ${t.name}</option>`).join('');
+        }
+    }
+
+    function renderCategoryButtons() {
+        const container = document.getElementById('categoryContainer');
+        if (!container) return;
+        let html = `<span class="cat-label"><i class="fas fa-filter"></i> 产品系列：</span>
+                    <button class="cat-btn active" data-type="all">全部产品</button>`;
+        productTypes.forEach(type => {
+            html += `<button class="cat-btn" data-type="${type.name}">${type.icon || '📦'} ${type.name}</button>`;
+        });
+        container.innerHTML = html;
+        document.querySelectorAll(".cat-btn").forEach(btn => {
+            btn.addEventListener("click", function() {
+                document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+                this.classList.add("active");
+                currentFilter = this.getAttribute("data-type");
+                updateDetailPanel();
+            });
+        });
+    }
+
+    function addProductType() {
+        if (!isAdminLoggedIn()) { alert("请先登录管理员账号"); return; }
+        const newName = document.getElementById('newTypeName').value.trim();
+        if (!newName) { alert("请输入类型名称"); return; }
+        if (productTypes.some(t => t.name === newName)) { alert("该类型已存在"); return; }
+        const icon = document.getElementById('newTypeIcon').value.trim() || "📦";
+        productTypes.push({ id: "type_" + Date.now(), name: newName, icon: icon });
+        saveProductTypes();
+        document.getElementById('newTypeName').value = "";
+        document.getElementById('newTypeIcon').value = "";
+        updateTypeSelectors();
+        renderCategoryButtons();
+        renderTypeManageList();
+        updateExportFilter();
+        alert(`✅ 已添加类型: ${newName}`);
+    }
+
+    function updateProductType(oldName, newName, newIcon) {
+        if (!isAdminLoggedIn()) { alert("请先登录管理员账号"); return; }
+        if (!newName.trim()) { alert("类型名称不能为空"); return; }
+        if (oldName !== newName && productTypes.some(t => t.name === newName)) { alert("该类型名称已存在"); return; }
+        const typeIndex = productTypes.findIndex(t => t.name === oldName);
+        if (typeIndex !== -1) {
+            productTypes[typeIndex].name = newName;
+            if (newIcon) productTypes[typeIndex].icon = newIcon;
+            saveProductTypes();
+            for (let prov in salesDB) {
+                salesDB[prov].details.forEach(d => {
+                    if (d.type === oldName) d.type = newName;
+                });
+                for (let prov in salesDB) {
+                    const productMap = new Map();
+                    const companiesSet = new Set();
+                    salesDB[prov].details.forEach(d => {
+                        productMap.set(d.product, (productMap.get(d.product) || 0) + d.qty);
+                        if (d.company) companiesSet.add(d.company);
+                    });
+                    salesDB[prov].products = Array.from(productMap.entries()).map(([name, qty]) => ({ name, qty }));
+                    salesDB[prov].companies = companiesSet;
+                }
+            }
+            saveToLocal();
+            updateTypeSelectors();
+            renderCategoryButtons();
+            renderTypeManageList();
+            updateExportFilter();
+            refreshAll();
+            alert(`✅ 已更新类型: ${oldName} → ${newName}`);
+        }
+    }
+
+    function deleteProductType(typeName) {
+        if (!isAdminLoggedIn()) { alert("请先登录管理员账号"); return; }
+        let hasUsage = false;
+        for (let prov in salesDB) {
+            if (salesDB[prov].details.some(d => d.type === typeName)) {
+                hasUsage = true;
+                break;
+            }
+        }
+        if (hasUsage) {
+            alert(`⚠️ 无法删除：还有业绩记录使用"${typeName}"类型`);
+            return;
+        }
+        if (confirm(`确定删除类型"${typeName}"吗？`)) {
+            productTypes = productTypes.filter(t => t.name !== typeName);
+            saveProductTypes();
+            updateTypeSelectors();
+            renderCategoryButtons();
+            renderTypeManageList();
+            updateExportFilter();
+            alert(`✅ 已删除类型: ${typeName}`);
+        }
+    }
+
+    function renderTypeManageList() {
+        const container = document.getElementById('typeList');
+        if (!container) return;
+        let html = `<table class="data-table"><thead><tr><th>图标</th><th>类型名称</th><th>操作</th></tr></thead><tbody>`;
+        productTypes.forEach(type => {
+            const safeId = type.name.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+            html += `<tr>
+                        <td><input type="text" id="icon_${safeId}" value="${type.icon || '📦'}" style="width:60px;" placeholder="图标"></td>
+                        <td><input type="text" id="name_${safeId}" value="${type.name}" style="width:150px;"></td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="saveTypeEdit('${type.name.replace(/'/g, "\\'")}')"><i class="fas fa-save"></i> 保存</button>
+                            <button class="action-btn delete-btn" onclick="deleteProductType('${type.name.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i> 删除</button>
+                        </td>
+                     </tr>`;
+        });
+        html += `</tbody>`;
+        container.innerHTML = html;
+    }
+
+    function saveTypeEdit(oldName) {
+        const safeId = oldName.replace(/\s/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+        const newName = document.getElementById(`name_${safeId}`).value.trim();
+        const newIcon = document.getElementById(`icon_${safeId}`).value.trim();
+        updateProductType(oldName, newName, newIcon);
+    }
+
+    // ================= 业绩数据库 =================
+    function initDataStructure() {
+        const saved = localStorage.getItem('ruize_salesDB');
+        if (saved) {
+            try {
+                salesDB = JSON.parse(saved);
+                for (let prov in salesDB) {
+                    salesDB[prov].companies = new Set(salesDB[prov].companies);
+                }
+                return;
+            } catch(e) {}
+        }
+        loadDefaultData();
+    }
+
+    function saveToLocal() {
+        const toSave = {};
+        for (let prov in salesDB) {
+            toSave[prov] = {
+                products: salesDB[prov].products,
+                companies: Array.from(salesDB[prov].companies),
+                details: salesDB[prov].details
+            };
+        }
+        localStorage.setItem('ruize_salesDB', JSON.stringify(toSave));
+        updateExportStats();
+    }
+
+    function addSale(province, productName, qty, companyName = "", productType = "") {
+        if (!salesDB[province]) {
+            salesDB[province] = { products: [], companies: new Set(), details: [] };
+        }
+        const existingProduct = salesDB[province].products.find(p => p.name === productName);
+        if (existingProduct) existingProduct.qty += qty;
+        else salesDB[province].products.push({ name: productName, qty: qty });
+        if (companyName && companyName !== "") salesDB[province].companies.add(companyName);
+        salesDB[province].details.push({
+            id: Date.now() + Math.random(),
+            company: companyName || "其他客户",
+            product: productName,
+            qty: qty,
+            type: productType,
+            date: new Date().toLocaleDateString()
+        });
+        saveToLocal();
+        refreshAll();
+    }
+
+    function deleteDetailItem(province, detailId) {
+        if (salesDB[province]) {
+            salesDB[province].details = salesDB[province].details.filter(d => d.id != detailId);
+            const productMap = new Map();
+            const companiesSet = new Set();
+            salesDB[province].details.forEach(d => {
+                productMap.set(d.product, (productMap.get(d.product) || 0) + d.qty);
+                if (d.company) companiesSet.add(d.company);
+            });
+            salesDB[province].products = Array.from(productMap.entries()).map(([name, qty]) => ({ name, qty }));
+            salesDB[province].companies = companiesSet;
+            saveToLocal();
+            refreshAll();
+        }
+    }
+
+    function updateDetailItem(province, detailId, newQty, newCompany) {
+        if (salesDB[province]) {
+            const detail = salesDB[province].details.find(d => d.id == detailId);
+            if (detail) {
+                detail.qty = newQty;
+                if (newCompany) detail.company = newCompany;
+                const productMap = new Map();
+                const companiesSet = new Set();
+                salesDB[province].details.forEach(d => {
+                    productMap.set(d.product, (productMap.get(d.product) || 0) + d.qty);
+                    if (d.company) companiesSet.add(d.company);
+                });
+                salesDB[province].products = Array.from(productMap.entries()).map(([name, qty]) => ({ name, qty }));
+                salesDB[province].companies = companiesSet;
+                saveToLocal();
+                refreshAll();
+            }
+        }
+    }
+
+    function loadDefaultData() {
+        salesDB = {};
+        const defaultSales = [
+            { prov: "河北省", company: "石家庄福利乙炔气厂", product: "RZ-YA-20C 氩气纯化装置", qty: 1, type: "氩气纯化" },
+            { prov: "辽宁省", company: "营口东兴气体有限公司", product: "RZ-YA-20C 氩气纯化装置", qty: 2, type: "氩气纯化" },
+            { prov: "山东省", company: "章丘盛源气体有限公司", product: "RZ-YA-30C 氩气纯化装置", qty: 1, type: "氩气纯化" },
+            { prov: "江苏省", company: "常州武进华阳气体有限公司", product: "RZ-YA-10C 氩气纯化装置", qty: 2, type: "氩气纯化" },
+            { prov: "广东省", company: "广东阳江同德工业气体有限公司", product: "RZ-YA-20C 氩气纯化装置", qty: 1, type: "氩气纯化" },
+            { prov: "湖南省", company: "株洲晨昕中高频设备有限公司", product: "RZ-YA-4C 氩气净化装置", qty: 268, type: "氩气纯化" },
+            { prov: "江苏省", company: "南京立业工业气体有限公司", product: "RZ-DYC-10 型氮气纯化装置", qty: 1, type: "氮气纯化" },
+            { prov: "贵州省", company: "贵州振华风光半导体有限公司", product: "RZ-DYC-10 型氮气纯化装置", qty: 1, type: "氮气纯化" },
+            { prov: "北京市", company: "北京科技大学", product: "RZ-QYC-1/0.8 氢气纯化装置", qty: 1, type: "氢气纯化" },
+            { prov: "广东省", company: "东莞瑞邦制氮净化设备有限公司", product: "RZ-HN-20 氢氮混气装置", qty: 2, type: "混合配气" },
+            { prov: "河南省", company: "平顶山业强科技有限公司", product: "RZ-HN-300 氢氮混气装置", qty: 1, type: "混合配气" },
+            { prov: "湖南省", company: "湖南岳阳IO史密斯公司", product: "RZ-HEHNC-60 氦气回收纯化装置", qty: 1, type: "气体回收提纯" }
+        ];
+        defaultSales.forEach(item => {
+            if (!salesDB[item.prov]) salesDB[item.prov] = { products: [], companies: new Set(), details: [] };
+            const existingProduct = salesDB[item.prov].products.find(p => p.name === item.product);
+            if (existingProduct) existingProduct.qty += item.qty;
+            else salesDB[item.prov].products.push({ name: item.product, qty: item.qty });
+            salesDB[item.prov].companies.add(item.company);
+            salesDB[item.prov].details.push({
+                id: Date.now() + Math.random() * 10000,
+                company: item.company,
+                product: item.product,
+                qty: item.qty,
+                type: item.type,
+                date: new Date().toLocaleDateString()
+            });
+        });
+        saveToLocal();
+    }
+
+    // ================= UI 更新 =================
+    function refreshAll() { updateGlobalStats(); updateDetailPanel(); refreshMapMarkers(); }
+
+    function updateGlobalStats() {
+        const provinces = Object.keys(salesDB);
+        let totalQty = 0, totalCompanies = 0;
+        for (let prov of provinces) {
+            totalQty += salesDB[prov].products.reduce((s, p) => s + p.qty, 0);
+            totalCompanies += salesDB[prov].companies.size;
+        }
+        document.getElementById("globalStats").innerHTML = `
+            <div class="metric-row"><span><i class="fas fa-building"></i> 覆盖省份</span><span><strong>${provinces.length}</strong> 个</span></div>
+            <div class="metric-row"><span><i class="fas fa-users"></i> 客户总数</span><span><strong>${totalCompanies}</strong> 家</span></div>
+            <div class="metric-row"><span><i class="fas fa-boxes"></i> 设备总销量</span><span><strong>${totalQty.toLocaleString()}</strong> 台套</span></div>`;
+    }
+
+    function getFilteredDetails(province, filterType) {
+        if (!salesDB[province]) return [];
+        if (filterType === "all") return salesDB[province].details;
+        return salesDB[province].details.filter(d => d.type === filterType);
+    }
+
+    function updateDetailPanel() {
+        const details = getFilteredDetails(currentProvince, currentFilter);
+        const detailDiv = document.getElementById("dynamicDetail");
+        if (!details.length) {
+            detailDiv.innerHTML = `<div style="padding:40px; text-align:center;"><i class="fas fa-info-circle" style="font-size:2rem;"></i><p>${currentProvince} 暂无此类产品业绩</p><p style="font-size:0.8rem; margin-top:8px;">请切换产品分类或选择其他省份</p></div>`;
+            return;
+        }
+        const totalQty = details.reduce((s, d) => s + d.qty, 0);
+        const uniqueCompanies = new Set(details.map(d => d.company));
+        let tableHtml = `<table class="detail-table"><thead><tr><th>客户名称</th><th>产品型号</th><th>数量(台)</th><th>产品类型</th><th>录入日期</th></tr></thead><tbody>`;
+        details.forEach(d => { 
+            tableHtml += `<tr><td style="max-width:150px; word-break:break-word;">${d.company}</td><td style="max-width:200px; word-break:break-word;">${d.product}</td><td style="text-align:center;">${d.qty}</td><td>${d.type}</td><td>${d.date || '-'}</td></tr>`; 
+        });
+        tableHtml += `</tbody>`;
+        detailDiv.innerHTML = `<div class="province-title"><i class="fas fa-location-dot"></i> ${currentProvince}<button class="back-btn" onclick="document.querySelector('.detail-card').scrollTop=0"><i class="fas fa-arrow-up"></i> 回到顶部</button></div>
+            <div class="metric-row"><span>📊 设备总销量</span><span><strong style="color:#0b5a7a; font-size:1.2rem;">${totalQty}</strong> 台套</span></div>
+            <div class="metric-row"><span>🏢 合作客户数量</span><span><strong>${uniqueCompanies.size}</strong> 家</span></div>
+            <div style="margin-top:16px; font-weight:600; color:#1e5a7a;"><i class="fas fa-list-ul"></i> 业绩明细列表</div>
+            ${tableHtml}
+            <div class="company-count"><i class="fas fa-check-circle" style="color:#27ae60;"></i> 共 ${details.length} 条记录 | 数据实时更新</div>`;
+    }
+
+    window.showProvinceDetail = function(province) {
+        currentProvince = province;
+        updateDetailPanel();
+        document.querySelector('.detail-card').scrollTop = 0;
+    };
+
+    function refreshMapMarkers() {
+        if (!map) return;
+        markers.forEach(m => map.removeOverlay(m));
+        markers = [];
+        
+        const points = { 
+            "北京市":[116.4074,39.9042], "天津市":[117.1902,39.1256], "上海市":[121.4737,31.2304],
+            "重庆市":[106.5044,29.5582], "河北省":[114.4995,38.1006], "山西省":[112.5624,37.8735],
+            "辽宁省":[123.4315,41.8057], "吉林省":[125.3245,43.8868], "黑龙江省":[126.6424,45.7567],
+            "江苏省":[118.7674,32.0415], "浙江省":[120.1536,30.2875], "安徽省":[117.2830,31.8612],
+            "福建省":[119.3062,26.0753], "江西省":[115.8922,28.6765], "山东省":[117.0009,36.6758],
+            "河南省":[113.6654,34.7570], "湖北省":[114.2986,30.5844], "湖南省":[112.9823,28.1941],
+            "广东省":[113.2644,23.1291], "广西壮族自治区":[108.3200,22.8240], "海南省":[110.3312,20.0320],
+            "四川省":[104.0657,30.6595], "贵州省":[106.7135,26.5783], "云南省":[102.7123,25.0406],
+            "西藏":[91.1409,29.6565], "陕西省":[108.9480,34.2632], "甘肃省":[103.8236,36.0580],
+            "青海省":[101.7800,36.6200], "宁夏回族自治区":[106.2782,38.4664], "新疆维吾尔自治区":[87.6168,43.8266],
+            "内蒙古自治区":[111.6708,40.8183]
+        };
+        
+        let maxQty = 0;
+        for (let prov in salesDB) {
+            const totalQty = salesDB[prov].products.reduce((s, p) => s + p.qty, 0);
+            if (totalQty > maxQty) maxQty = totalQty;
+        }
+        maxQty = Math.max(maxQty, 100);
+        
+        for (let prov in salesDB) {
+            const coords = points[prov];
+            if (coords) {
+                const point = new BMap.Point(coords[0], coords[1]);
+                const totalQty = salesDB[prov].products.reduce((s, p) => s + p.qty, 0);
+                const companyCount = salesDB[prov].companies.size;
+                
+                const marker = new BMap.Marker(point);
+                const infoWindowContent = `
+                    <div class="info-window-content">
+                        <h4><i class="fas fa-chart-line"></i> ${prov}</h4>
+                        <p><strong>📊 设备总销量:</strong> ${totalQty} 台套</p>
+                        <p><strong>🏢 客户数量:</strong> ${companyCount} 家</p>
+                        <p><strong>📦 产品种类:</strong> ${salesDB[prov].products.length} 种</p>
+                        <div class="detail-link" onclick="showProvinceDetail('${prov}'); map.closeInfoWindow();">
+                            🔍 点击查看详细业绩列表 →
+                        </div>
+                    </div>
+                `;
+                const infoWindow = new BMap.InfoWindow(infoWindowContent, { width: 240, height: 150 });
+                marker.addEventListener("click", function(e) { map.openInfoWindow(infoWindow, point); });
+                map.addOverlay(marker);
+                markers.push(marker);
+                
+                const radius = 8 + (totalQty / maxQty) * 25;
+                const opacity = 0.3 + (totalQty / maxQty) * 0.4;
+                const circle = new BMap.Circle(point, Math.min(radius * 1000, 50000), {
+                    strokeColor: "#0b5a7a", strokeWeight: 1.5, strokeOpacity: 0.6,
+                    fillColor: "#e67e22", fillOpacity: opacity
+                });
+                map.addOverlay(circle);
+            }
+        }
+    }
+
+    function initBaiduMap() {
+        const mapDiv = document.getElementById("baiduMap");
+        if (mapDiv) mapDiv.innerHTML = '';
+        map = new BMap.Map("baiduMap");
+        map.centerAndZoom(new BMap.Point(105.0, 35.0), 5);
+        map.enableScrollWheelZoom(true);
+        map.addControl(new BMap.NavigationControl());
+        map.addControl(new BMap.ScaleControl());
+        refreshMapMarkers();
+        if (salesDB["广东省"]) { currentProvince = "广东省"; updateDetailPanel(); }
+    }
+
+    // ================= 导出功能 =================
+    function getAllRecords(filterType = "all") {
+        let records = [];
+        for (let prov in salesDB) {
+            for (let detail of salesDB[prov].details) {
+                if (filterType === "all" || detail.type === filterType) {
+                    records.push({
+                        省份: prov,
+                        客户名称: detail.company,
+                        产品型号: detail.product,
+                        销售数量: detail.qty,
+                        产品类型: detail.type,
+                        录入日期: detail.date || '-'
+                    });
+                }
+            }
+        }
+        return records;
+    }
+    
+    function updateExportStats() {
+        const totalRecords = getAllRecords("all").length;
+        const byType = {};
+        productTypes.forEach(t => {
+            byType[t.name] = getAllRecords(t.name).length;
+        });
+        let statsHtml = `<p><strong>总记录数：</strong> ${totalRecords} 条</p>`;
+        statsHtml += `<p><strong>按类型分布：</strong></p><ul style="margin-left:20px;">`;
+        for (let [type, count] of Object.entries(byType)) {
+            if (count > 0) statsHtml += `<li>${type}: ${count} 条</li>`;
+        }
+        statsHtml += `</ul>`;
+        document.getElementById('exportStats').innerHTML = statsHtml;
+    }
+    
+    function exportToExcel() {
+        const filterType = document.getElementById('exportFilterType').value;
+        const records = getAllRecords(filterType);
+        
+        if (records.length === 0) {
+            alert("没有数据可导出");
+            return;
+        }
+        
+        // 定义列头
+        const headers = ['省份', '客户名称', '产品型号', '销售数量', '产品类型', '录入日期'];
+        
+        // 转换为CSV格式
+        let csvContent = headers.join(',') + '\n';
+        
+        records.forEach(record => {
+            const row = headers.map(header => {
+                let value = record[header];
+                // 处理包含逗号、换行符、引号的内容
+                if (value === undefined || value === null) value = '';
+                value = String(value);
+                if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+                    value = '"' + value.replace(/"/g, '""') + '"';
+                }
+                return value;
+            }).join(',');
+            csvContent += row + '\n';
+        });
+        
+        // 添加BOM用于支持中文
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const fileName = filterType === 'all' ? '瑞泽净化_全部业绩.csv' : `瑞泽净化_${filterType}_业绩.csv`;
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert(`✅ 导出成功！共导出 ${records.length} 条记录`);
+    }
+    
+    function exportToJSON() {
+        const filterType = document.getElementById('exportFilterType').value;
+        const records = getAllRecords(filterType);
+        
+        if (records.length === 0) {
+            alert("没有数据可导出");
+            return;
+        }
+        
+        // 构建完整导出数据结构
+        const exportData = {
+            exportTime: new Date().toLocaleString(),
+            filterType: filterType === 'all' ? '全部' : filterType,
+            totalRecords: records.length,
+            data: records,
+            summary: {
+                totalSales: records.reduce((sum, r) => sum + r.销售数量, 0),
+                uniqueCustomers: new Set(records.map(r => r.客户名称)).size,
+                provinces: [...new Set(records.map(r => r.省份))]
+            }
+        };
+        
+        const jsonStr = JSON.stringify(exportData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const fileName = filterType === 'all' ? '瑞泽净化_全部业绩.json' : `瑞泽净化_${filterType}_业绩.json`;
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        
+        alert(`✅ 导出成功！共导出 ${records.length} 条记录`);
+    }
+
+    // ================= 管理员后台 =================
+    function openAdminLogin() { 
+        if (isAdminLoggedIn()) { openAdminModal(); return; }
+        document.getElementById("adminLoginModal").classList.add("active"); 
+        document.getElementById("adminPassword").value = ""; 
+        document.getElementById("loginError").innerHTML = ""; 
+    }
+    function closeAdminLogin() { document.getElementById("adminLoginModal").classList.remove("active"); }
+    function checkAdminLogin() {
+        if (document.getElementById("adminPassword").value === ADMIN_PASSWORD) { 
+            setAdminLoggedIn(true);
+            closeAdminLogin(); 
+            openAdminModal(); 
+        } else {
+            document.getElementById("loginError").innerHTML = "密码错误，请重试";
+        }
+    }
+    function openAdminModal() { 
+        if (!isAdminLoggedIn()) { openAdminLogin(); return; }
+        document.getElementById("adminModal").classList.add("active"); 
+        loadEditList(); 
+        loadDataList(); 
+        renderTypeManageList(); 
+        updateExportStats();
+    }
+    function closeAdminModal() { document.getElementById("adminModal").classList.remove("active"); }
+    
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        if (tab === 'add') { 
+            document.querySelector('.tab-btn:first-child').classList.add('active'); 
+            document.getElementById('addTab').style.display = 'block'; 
+        } else if (tab === 'edit') { 
+            document.querySelectorAll('.tab-btn')[1].classList.add('active'); 
+            document.getElementById('editTab').style.display = 'block'; 
+            loadEditList(); 
+        } else if (tab === 'list') { 
+            document.querySelectorAll('.tab-btn')[2].classList.add('active'); 
+            document.getElementById('listTab').style.display = 'block'; 
+            loadDataList(); 
+        } else if (tab === 'export') {
+            document.querySelectorAll('.tab-btn')[3].classList.add('active');
+            document.getElementById('exportTab').style.display = 'block';
+            updateExportStats();
+        } else { 
+            document.querySelectorAll('.tab-btn')[4].classList.add('active'); 
+            document.getElementById('typeManageTab').style.display = 'block'; 
+            renderTypeManageList(); 
+        }
+    }
+    
+    // 编辑/删除列表加载（带搜索）
+    function loadEditList() {
+        const searchProv = document.getElementById('editSearchProvince').value.toLowerCase();
+        const searchProd = document.getElementById('editSearchProduct').value.toLowerCase();
+        const searchType = document.getElementById('editSearchType').value;
+        
+        let allRecords = [];
+        for (let prov in salesDB) {
+            for (let detail of salesDB[prov].details) {
+                allRecords.push({ prov: prov, detail: detail });
+            }
+        }
+        
+        let filtered = allRecords;
+        if (searchProv) filtered = filtered.filter(r => r.prov.toLowerCase().includes(searchProv));
+        if (searchProd) filtered = filtered.filter(r => r.detail.product.toLowerCase().includes(searchProd) || r.detail.company.toLowerCase().includes(searchProd));
+        if (searchType) filtered = filtered.filter(r => r.detail.type === searchType);
+        
+        if (filtered.length === 0) {
+            document.getElementById('editList').innerHTML = '<div class="no-data"><i class="fas fa-search"></i> 没有找到匹配的记录</div>';
+            return;
+        }
+        
+        let html = `<div class="search-result-count">找到 ${filtered.length} 条记录</div>
+                    <table class="data-table"><thead><tr><th>省份</th><th>客户</th><th>产品</th><th>数量</th><th>类型</th><th>操作</th></thead><tbody>`;
+        for (let r of filtered) {
+            html += `<tr>
+                        <td>${r.prov}</td>
+                        <td style="max-width:150px; word-break:break-word;">${r.detail.company}</td>
+                        <td style="max-width:180px; word-break:break-word;">${r.detail.product}</td>
+                        <td><input type="number" id="qty_${r.detail.id}" value="${r.detail.qty}" style="width:70px;"></td>
+                        <td>${r.detail.type}</td>
+                        <td>
+                            <button class="action-btn edit-btn" onclick="updateItem('${r.prov}', ${r.detail.id})"><i class="fas fa-save"></i></button>
+                            <button class="action-btn delete-btn" onclick="deleteItem('${r.prov}', ${r.detail.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                      </td>`;
+        }
+        html += '</tbody></table>';
+        document.getElementById('editList').innerHTML = html;
+    }
+    
+    function resetEditSearch() {
+        document.getElementById('editSearchProvince').value = '';
+        document.getElementById('editSearchProduct').value = '';
+        document.getElementById('editSearchType').value = '';
+        loadEditList();
+    }
+    
+    // 数据列表加载（带搜索）
+    function loadDataList() {
+        const searchKeyword = document.getElementById('listSearchInput').value.toLowerCase();
+        
+        let allRecords = [];
+        for (let prov in salesDB) {
+            for (let detail of salesDB[prov].details) {
+                allRecords.push({ prov: prov, detail: detail });
+            }
+        }
+        
+        let filtered = allRecords;
+        if (searchKeyword) {
+            filtered = filtered.filter(r => 
+                r.prov.toLowerCase().includes(searchKeyword) ||
+                r.detail.company.toLowerCase().includes(searchKeyword) ||
+                r.detail.product.toLowerCase().includes(searchKeyword)
+            );
+        }
+        
+        const resultInfo = document.getElementById('searchResultInfo');
+        if (resultInfo) {
+            if (searchKeyword) {
+                resultInfo.innerHTML = `<i class="fas fa-search"></i> 搜索 "${searchKeyword}" 找到 ${filtered.length} 条记录`;
+            } else {
+                resultInfo.innerHTML = `<i class="fas fa-database"></i> 共 ${filtered.length} 条业绩记录`;
+            }
+        }
+        
+        if (filtered.length === 0) {
+            document.getElementById('dataList').innerHTML = '<div class="no-data"><i class="fas fa-search"></i> 没有找到匹配的记录，请尝试其他关键词</div>';
+            return;
+        }
+        
+        let html = `<table class="data-table"><thead><tr><th>省份</th><th>客户</th><th>产品型号</th><th>数量(台)</th><th>类型</th><th>录入日期</th></thead><tbody>`;
+        for (let r of filtered) {
+            html += `<tr>
+                        <td>${r.prov}</td>
+                        <td style="max-width:150px; word-break:break-word;">${r.detail.company}</td>
+                        <td style="max-width:200px; word-break:break-word;">${r.detail.product}</td>
+                        <td style="text-align:center;">${r.detail.qty}</td>
+                        <td>${r.detail.type}</td>
+                        <td>${r.detail.date || '-'}</td>
+                      </tr>`;
+        }
+        html += '</tbody></table>';
+        document.getElementById('dataList').innerHTML = html;
+    }
+    
+    function resetDataList() {
+        document.getElementById('listSearchInput').value = '';
+        loadDataList();
+    }
+    
+    function updateItem(province, id) { 
+        const newQty = parseInt(document.getElementById(`qty_${id}`).value); 
+        if (isNaN(newQty) || newQty < 0) { alert("请输入有效数量"); return; } 
+        updateDetailItem(province, id, newQty, null); 
+        loadEditList(); 
+        alert("更新成功"); 
+    }
+    
+    function deleteItem(province, id) { 
+        if (confirm("确定删除这条业绩记录吗？")) { 
+            deleteDetailItem(province, id); 
+            loadEditList(); 
+            loadDataList(); 
+            updateExportStats();
+            alert("删除成功"); 
+        } 
+    }
+    
+    document.getElementById('addForm').addEventListener('submit', function(e) { 
+        e.preventDefault(); 
+        addSale(
+            document.getElementById('addProvince').value, 
+            document.getElementById('addProductName').value, 
+            parseInt(document.getElementById('addQty').value), 
+            document.getElementById('addCompany').value, 
+            document.getElementById('addProductType').value
+        ); 
+        alert("添加成功"); 
+        this.reset(); 
+        closeAdminModal(); 
+    });
+
+    // 初始化
+    loadProductTypes();
+    initDataStructure();
+    updateAdminUI();
+    
+    window.onload = () => { 
+        setTimeout(() => { 
+            if (typeof BMap !== 'undefined') { 
+                initBaiduMap(); 
+                updateGlobalStats(); 
+            } 
+        }, 200); 
+    };
+</script>
+</body>
+</html>
