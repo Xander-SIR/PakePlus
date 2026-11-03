@@ -1,0 +1,2229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>瑞泽净化 - 销售工作流系统</title>
+<style>
+    /* ============================================
+       Design Tokens
+       ============================================ */
+    :root {
+        --primary-50:  #eff6ff;
+        --primary-100: #dbeafe;
+        --primary-200: #bfdbfe;
+        --primary-300: #93c5fd;
+        --primary-400: #60a5fa;
+        --primary-500: #3b82f6;
+        --primary-600: #2563eb;
+        --primary-700: #1d4ed8;
+        --primary-800: #1e40af;
+        --primary-900: #1e3a8a;
+
+        --slate-50:  #f8fafc;
+        --slate-100: #f1f5f9;
+        --slate-200: #e2e8f0;
+        --slate-300: #cbd5e1;
+        --slate-400: #94a3b8;
+        --slate-500: #64748b;
+        --slate-600: #475569;
+        --slate-700: #334155;
+        --slate-800: #1e293b;
+        --slate-900: #0f172a;
+
+        --amber-50:  #fffbeb;
+        --amber-100: #fef3c7;
+        --amber-500: #f59e0b;
+        --amber-600: #d97706;
+        --amber-700: #b45309;
+
+        --emerald-50:  #ecfdf5;
+        --emerald-500: #10b981;
+        --emerald-600: #059669;
+
+        --rose-50:  #fff1f2;
+        --rose-500: #f43f5e;
+        --rose-600: #e11d48;
+
+        --violet-500: #8b5cf6;
+        --violet-600: #7c3aed;
+
+        /* Semantics */
+        --bg-page: #eef2f7;
+        --bg-card: #ffffff;
+        --bg-soft: #f8fafc;
+        --text-primary:   #1e293b;
+        --text-secondary: #475569;
+        --text-muted:     #94a3b8;
+        --border-light:  #e2e8f0;
+        --border-medium: #cbd5e1;
+
+        /* Radius */
+        --radius-sm: 8px;
+        --radius:    12px;
+        --radius-lg: 18px;
+
+        /* Shadows */
+        --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+        --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.03);
+        --shadow:    0 4px 10px -2px rgba(15, 23, 42, 0.07), 0 2px 4px -1px rgba(15, 23, 42, 0.04);
+        --shadow-md: 0 10px 24px -6px rgba(15, 23, 42, 0.1), 0 4px 8px -2px rgba(15, 23, 42, 0.05);
+        --shadow-lg: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+        --ring:      0 0 0 3px rgba(59, 130, 246, 0.16);
+    }
+
+    /* ============================================
+       Base
+       ============================================ */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                     "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+        background:
+            radial-gradient(1200px 600px at 0% -10%, rgba(59,130,246,0.08), transparent 60%),
+            radial-gradient(900px 500px at 100% 0%, rgba(139,92,246,0.06), transparent 60%),
+            var(--bg-page);
+        margin: 0;
+        padding: 24px;
+        color: var(--text-primary);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.55;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+        background: var(--slate-300);
+        border-radius: 999px;
+        border: 2px solid transparent;
+        background-clip: padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--slate-400); background-clip: padding-box; }
+
+    button { font-family: inherit; }
+
+    /* ============================================
+       Top Bar
+       ============================================ */
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1440px;
+        margin: 0 auto 24px auto;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+    .top-bar h1 {
+        color: var(--primary-900);
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .top-bar h1::before {
+        content: "";
+        width: 6px;
+        height: 26px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--primary-500), var(--violet-500));
+        flex-shrink: 0;
+    }
+
+    .top-input-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: #fff;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-xs);
+        flex-wrap: wrap;
+    }
+    .top-input-group label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-700);
+        letter-spacing: 0.02em;
+    }
+    .top-input-group input,
+    #clientType {
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--border-light);
+        background: var(--slate-50);
+        font-size: 14px;
+        color: var(--text-primary);
+        outline: none;
+        transition: all 0.18s ease;
+    }
+    .top-input-group input { width: 130px; }
+    .top-input-group input:focus,
+    #clientType:focus {
+        border-color: var(--primary-400);
+        background: #fff;
+        box-shadow: var(--ring);
+    }
+    #clientType {
+        font-weight: 700;
+        color: var(--primary-700);
+        cursor: pointer;
+        padding-right: 30px;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+    }
+
+    .btn-settings {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: #fff;
+        border: none;
+        padding: 11px 20px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px -4px rgba(15, 23, 42, 0.4);
+    }
+    .btn-settings:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.5);
+    }
+
+    /* ============================================
+       Layout
+       ============================================ */
+    .main-layout {
+        display: flex;
+        gap: 24px;
+        max-width: 1440px;
+        margin: 0 auto;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+    .left-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-width: 0;
+    }
+
+    /* ============================================
+       Chat Window
+       ============================================ */
+    .chat-window {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        height: 45vh;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        position: relative;
+        scroll-behavior: smooth;
+    }
+
+    .welcome-board {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--text-muted);
+        text-align: center;
+        padding: 20px;
+    }
+    .welcome-board h2 {
+        color: var(--primary-800);
+        margin: 0 0 10px 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+    .welcome-board p { margin: 0; font-size: 15px; max-width: 360px; line-height: 1.7; }
+
+    .message {
+        max-width: 82%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 15px;
+        line-height: 1.65;
+        animation: messageIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        position: relative;
+        transition: transform 0.15s ease, box-shadow 0.2s ease;
+        word-wrap: break-word;
+    }
+    .message:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+    }
+    .message:hover::after {
+        content: "点击复制";
+        position: absolute;
+        right: 10px;
+        top: -10px;
+        font-size: 11px;
+        background: var(--slate-800);
+        color: #fff;
+        padding: 3px 8px;
+        border-radius: 6px;
+        opacity: 0.9;
+        white-space: nowrap;
+    }
+    .message.sales {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: var(--primary-900);
+        border-bottom-right-radius: 6px;
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.12);
+    }
+    .message.client {
+        align-self: flex-start;
+        background: #fff;
+        color: var(--slate-800);
+        border-bottom-left-radius: 6px;
+        border-left: 3px solid var(--slate-400);
+        box-shadow: var(--shadow-sm);
+    }
+
+    @keyframes messageIn {
+        from { opacity: 0; transform: translateY(8px) scale(0.98); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ============================================
+       Action Panel
+       ============================================ */
+    .action-panel {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 22px 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+    .action-title {
+        font-weight: 800;
+        margin-bottom: 16px;
+        color: var(--primary-900);
+        border-bottom: 2px solid var(--slate-100);
+        padding-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 15px;
+        letter-spacing: -0.01em;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .btn {
+        background: #fff;
+        color: var(--text-primary);
+        border: 1.5px solid var(--border-light);
+        padding: 14px 16px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-size: 15px;
+        text-align: left;
+        transition: all 0.18s ease;
+        box-shadow: var(--shadow-xs);
+        position: relative;
+        font-weight: 500;
+    }
+    .btn:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-300);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+        color: var(--primary-900);
+    }
+    .btn:active { transform: translateY(0); }
+    .btn.sales-btn {
+        border-left: 4px solid var(--primary-500);
+        background: linear-gradient(135deg, #fff, var(--primary-50));
+        color: var(--primary-800);
+        font-weight: 700;
+    }
+    .btn.sales-btn:hover {
+        background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    }
+    .btn.client-btn {
+        border-left: 4px solid var(--slate-400);
+    }
+
+    .btn-hangup {
+        background: linear-gradient(135deg, #f43f5e, #e11d48);
+        color: #fff;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 13px;
+        display: none;
+        transition: all 0.18s ease;
+        box-shadow: 0 4px 10px -4px rgba(244, 63, 94, 0.5);
+    }
+    .btn-hangup:hover { transform: translateY(-1px); box-shadow: 0 8px 16px -6px rgba(244, 63, 94, 0.6); }
+
+    /* Tip / Pain tags / Region */
+    .tip-box {
+        background: var(--amber-50);
+        border: 1px solid #fde68a;
+        border-left: 4px solid var(--amber-500);
+        padding: 12px 16px;
+        border-radius: var(--radius);
+        font-size: 14px;
+        color: var(--amber-700);
+        margin-bottom: 14px;
+        line-height: 1.65;
+    }
+    .pain-tag-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 14px;
+        padding: 12px 14px;
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border-radius: var(--radius);
+        border: 1px dashed var(--primary-300);
+    }
+    .pain-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--primary-700);
+    }
+    .pain-tag {
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1.5px solid var(--border-light);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.18s ease;
+        font-weight: 500;
+    }
+    .pain-tag:hover {
+        border-color: var(--primary-400);
+        color: var(--primary-700);
+        transform: translateY(-1px);
+    }
+    .pain-tag.active {
+        background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 4px 10px -4px rgba(59, 130, 246, 0.5);
+    }
+
+    .region-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 16px;
+        align-items: center;
+    }
+    .region-selector label {
+        font-weight: 700;
+        color: var(--primary-900);
+        font-size: 14px;
+        white-space: nowrap;
+    }
+    .region-selector select {
+        flex: 1;
+        padding: 11px 14px;
+        border-radius: var(--radius);
+        border: 1.5px solid var(--primary-300);
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--primary-800);
+        outline: none;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.18s ease;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        padding-right: 36px;
+    }
+    .region-selector select:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+    }
+
+    /* ============================================
+       Report Card
+       ============================================ */
+    .report-card {
+        display: none;
+        background: #fff;
+        padding: 22px 24px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        border-top: 5px solid var(--rose-500);
+        margin-top: 4px;
+    }
+    .report-card h3 {
+        margin: 0 0 14px 0;
+        color: var(--slate-800);
+        font-size: 17px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+    .report-item {
+        margin-bottom: 10px;
+        font-size: 15px;
+        color: var(--text-secondary);
+        line-height: 1.65;
+    }
+    .report-item:last-child { margin-bottom: 0; }
+
+    /* ============================================
+       Modals
+       ============================================ */
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.2s ease;
+        padding: 20px;
+    }
+    .modal-content {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        width: 95%;
+        max-width: 1100px;
+        height: 85vh;
+        display: flex;
+        gap: 20px;
+        padding: 24px;
+        box-sizing: border-box;
+        box-shadow: var(--shadow-lg);
+        animation: modalIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modalIn {
+        from { opacity: 0; transform: scale(0.96) translateY(10px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ============================================
+       CRM
+       ============================================ */
+    #crmModal .modal-content {
+        display: block;
+        max-width: 1000px;
+        padding: 24px;
+    }
+    .crm-header {
+        font-size: 17px;
+        color: var(--primary-900);
+        font-weight: 800;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 14px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        letter-spacing: -0.01em;
+    }
+    .crm-list {
+        max-height: calc(85vh - 130px);
+        overflow-y: auto;
+        padding-right: 6px;
+    }
+    .crm-card {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 14px;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-xs);
+    }
+    .crm-card:hover {
+        border-color: var(--primary-300);
+        box-shadow: var(--shadow);
+        transform: translateY(-1px);
+    }
+    .crm-card.overdue {
+        border-color: #fecaca;
+        background: linear-gradient(135deg, #fef2f2, #fff1f2);
+    }
+    .crm-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .crm-tag-prov {
+        font-size: 11px;
+        background: var(--slate-100);
+        color: var(--slate-600);
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-right: 5px;
+        vertical-align: middle;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+    }
+    .crm-name {
+        font-weight: 700;
+        color: var(--slate-800);
+        font-size: 15px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .crm-level {
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .crm-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+        align-items: center;
+    }
+    .crm-row label {
+        font-size: 13px;
+        color: var(--text-muted);
+        width: 66px;
+        flex-shrink: 0;
+        font-weight: 500;
+    }
+    .crm-row select, .crm-row input {
+        flex: 1;
+        padding: 7px 10px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        outline: none;
+        background: var(--slate-50);
+        color: var(--text-primary);
+        transition: all 0.15s ease;
+    }
+    .crm-row select:focus, .crm-row input:focus {
+        border-color: var(--primary-400);
+        background: #fff;
+        box-shadow: var(--ring);
+    }
+    .crm-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+    .tag-btn {
+        font-size: 12px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: var(--slate-100);
+        color: var(--text-secondary);
+        border: 1px solid var(--border-light);
+        cursor: pointer;
+        transition: all 0.18s ease;
+        font-weight: 500;
+    }
+    .tag-btn:hover {
+        border-color: var(--primary-300);
+        color: var(--primary-700);
+    }
+    .tag-btn.active {
+        background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        color: #fff;
+        border-color: transparent;
+        box-shadow: 0 2px 8px -2px rgba(59, 130, 246, 0.5);
+    }
+    .crm-memo {
+        width: 100%;
+        height: 44px;
+        font-size: 13px;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-sm);
+        padding: 10px 12px;
+        box-sizing: border-box;
+        resize: none;
+        background: var(--slate-50);
+        margin-bottom: 10px;
+        font-family: inherit;
+        transition: all 0.15s ease;
+    }
+    .crm-memo:focus {
+        background: #fff;
+        border-color: var(--primary-400);
+        outline: none;
+        box-shadow: var(--ring);
+    }
+    .crm-actions {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        border-top: 1px dashed var(--border-light);
+        padding-top: 12px;
+    }
+    .btn-script {
+        flex: 1;
+        font-size: 12px;
+        padding: 8px 6px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-light);
+        background: #fff;
+        color: var(--primary-800);
+        cursor: pointer;
+        font-weight: 700;
+        transition: all 0.18s ease;
+        white-space: nowrap;
+    }
+    .btn-script:hover {
+        background: var(--primary-50);
+        border-color: var(--primary-300);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-xs);
+    }
+
+    /* ============================================
+       Toast
+       ============================================ */
+    #toast {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+        color: #fff;
+        padding: 12px 22px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 12px 28px -8px rgba(16, 185, 129, 0.5);
+        display: none;
+        z-index: 2000;
+        animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* ============================================
+       Settings Editor
+       ============================================ */
+    .tree-nav {
+        width: 290px;
+        background: var(--slate-50);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        padding: 18px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .tree-nav h3 {
+        font-size: 15px;
+        color: var(--primary-900);
+        margin: 0 0 14px 0;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 12px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+    .tree-list-container {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 14px;
+        padding-right: 4px;
+    }
+    .tree-node { margin-bottom: 4px; }
+    .tree-item {
+        padding: 9px 11px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        transition: all 0.15s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-weight: 500;
+    }
+    .tree-item:hover { background: var(--slate-200); }
+    .tree-item.active {
+        background: var(--primary-100);
+        color: var(--primary-900);
+        font-weight: 700;
+        box-shadow: inset 0 0 0 1px var(--primary-300);
+    }
+    .tree-item.prov-btn {
+        background: linear-gradient(135deg, #fef9c3, #fef08a);
+        color: #854d0e;
+        font-weight: 700;
+        border: 1px solid #fde047;
+        margin-bottom: 15px;
+    }
+    .tree-item.prov-btn.active {
+        background: linear-gradient(135deg, #eab308, #ca8a04);
+        color: #fff;
+        box-shadow: 0 4px 10px -4px rgba(234, 179, 8, 0.6);
+    }
+    .tree-toggle {
+        width: 20px;
+        text-align: center;
+        cursor: pointer;
+        color: var(--slate-400);
+        font-size: 11px;
+        margin-right: 6px;
+        user-select: none;
+    }
+    .tree-title {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .tree-delete {
+        color: var(--rose-500);
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        opacity: 0.3;
+        transition: all 0.15s ease;
+    }
+    .tree-item:hover .tree-delete { opacity: 1; }
+    .tree-delete:hover { background: var(--rose-50); }
+    .tree-children {
+        padding-left: 18px;
+        border-left: 1px dashed var(--slate-300);
+        margin-left: 10px;
+        display: block;
+    }
+    .tree-children.collapsed { display: none; }
+
+    .editor-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .editor-header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 14px;
+        margin-bottom: 16px;
+    }
+    .editor-header-bar h2 {
+        margin: 0;
+        color: var(--primary-900);
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+    }
+    .editor-content {
+        flex: 1;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
+    .node-box {
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        padding: 22px;
+        box-shadow: var(--shadow-xs);
+    }
+    .node-title {
+        font-size: 15px;
+        font-weight: 800;
+        color: var(--primary-900);
+        margin-bottom: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        letter-spacing: -0.01em;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+    }
+    .form-group textarea,
+    .form-group input[type="text"],
+    .form-group select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 14.5px;
+        box-sizing: border-box;
+        color: var(--text-primary);
+        background: #fff;
+        transition: all 0.15s ease;
+        line-height: 1.6;
+    }
+    .form-group textarea:focus,
+    .form-group input[type="text"]:focus,
+    .form-group select:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+        outline: none;
+    }
+    .form-group textarea {
+        height: 110px;
+        resize: vertical;
+    }
+
+    .prov-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+    .prov-item { display: flex; flex-direction: column; }
+    .prov-item label {
+        font-size: 12px;
+        color: var(--primary-800);
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+    .prov-item input {
+        padding: 10px 12px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
+        box-sizing: border-box;
+        transition: all 0.15s ease;
+    }
+    .prov-item input:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+        outline: none;
+    }
+
+    .branch-list {
+        margin-left: 10px;
+        padding-left: 20px;
+        border-left: 2px dashed var(--border-medium);
+    }
+    .branch-item {
+        background: var(--slate-50);
+        border: 1px solid var(--border-light);
+        padding: 12px 14px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 10px;
+        position: relative;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .branch-item::before {
+        content: "";
+        position: absolute;
+        left: -22px;
+        top: 50%;
+        width: 20px;
+        height: 2px;
+        background: var(--border-medium);
+        transform: translateY(-50%);
+    }
+    .branch-item input {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
+        transition: all 0.15s ease;
+    }
+    .branch-item input:focus {
+        border-color: var(--primary-500);
+        box-shadow: var(--ring);
+        outline: none;
+    }
+    .branch-item select {
+        width: 150px;
+        padding: 8px 10px;
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-sm);
+        font-size: 13.5px;
+        background: #fff;
+        cursor: pointer;
+    }
+    .branch-item .del-branch {
+        background: var(--rose-500);
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 12px;
+        transition: all 0.15s ease;
+    }
+    .branch-item .del-branch:hover { background: var(--rose-600); }
+
+    .btn-save {
+        background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
+        color: #fff;
+        border: none;
+        padding: 13px 24px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 700;
+        width: 100%;
+        transition: all 0.2s ease;
+        box-shadow: 0 6px 14px -6px rgba(16, 185, 129, 0.5);
+    }
+    .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px -6px rgba(16, 185, 129, 0.6);
+    }
+    .btn-add {
+        background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
+        color: #fff;
+        border: none;
+        padding: 10px 16px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-weight: 700;
+        margin-bottom: 14px;
+        font-size: 13px;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px -4px rgba(59, 130, 246, 0.5);
+    }
+    .btn-add:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.6);
+    }
+
+    /* ============================================
+       Admin Panel
+       ============================================ */
+    #adminModal .modal-content {
+        display: block;
+        max-width: 660px;
+        padding: 30px;
+        height: auto;
+        max-height: 88vh;
+        overflow-y: auto;
+    }
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 16px;
+        margin-bottom: 22px;
+    }
+    .admin-header h2 {
+        margin: 0;
+        color: var(--primary-900);
+        font-size: 21px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+    .admin-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+    .admin-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 22px 18px;
+        background: var(--slate-50);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+    .admin-card:hover {
+        background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+        border-color: var(--primary-300);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    .admin-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
+        line-height: 1;
+    }
+    .admin-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--primary-900);
+        margin-bottom: 5px;
+        letter-spacing: -0.01em;
+    }
+    .admin-desc {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.5;
+    }
+
+    /* ============================================
+       Responsive — Tablet
+       ============================================ */
+    @media (max-width: 1024px) {
+        .modal-content { flex-direction: column; }
+        .tree-nav {
+            width: 100%;
+            max-height: 40vh;
+            flex-shrink: 0;
+        }
+        .editor-panel { min-height: 300px; }
+    }
+
+    /* ============================================
+       Responsive — Mobile (< 768px)
+       ============================================ */
+    @media (max-width: 768px) {
+        body {
+            padding: 12px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+        .top-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .top-bar h1 {
+            font-size: 17px;
+            justify-content: center;
+            text-align: center;
+        }
+        .top-bar h1::before { height: 22px; width: 5px; }
+        .top-input-group {
+            border-radius: 14px;
+            padding: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .top-input-group label {
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+        }
+        .top-input-group input {
+            flex: 1;
+            min-width: 0;
+            width: auto !important;
+            font-size: 16px;
+            padding: 9px 12px;
+        }
+        .top-input-group input#clientCompany { flex: 1.5; }
+        #clientType { font-size: 14px; padding: 9px 30px 9px 12px; }
+
+        .top-actions {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .top-actions::-webkit-scrollbar { display: none; }
+        .btn-settings {
+            font-size: 13px;
+            padding: 10px 16px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .main-layout { gap: 14px; }
+        .chat-window {
+            height: 40vh;
+            padding: 14px;
+            gap: 10px;
+            border-radius: 14px;
+        }
+        .welcome-board h2 { font-size: 18px; }
+        .welcome-board p { font-size: 13px; }
+        .message {
+            max-width: 90%;
+            font-size: 14px;
+            padding: 10px 13px;
+            border-radius: 14px;
+        }
+        .message:hover::after { display: none; }
+
+        .action-panel { padding: 16px; border-radius: 14px; }
+        .action-title {
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+        }
+        .btn-hangup { font-size: 12px; padding: 8px 14px; }
+
+        .tip-box { font-size: 13px; padding: 10px 12px; margin-bottom: 10px; }
+        .pain-tag-box { padding: 10px; gap: 6px; margin-bottom: 12px; }
+        .pain-label { font-size: 12px; }
+        .pain-tag { font-size: 12px; padding: 6px 12px; }
+
+        .region-selector {
+            margin-bottom: 12px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .region-selector label { font-size: 13px; }
+        .region-selector select { font-size: 16px; padding: 11px 14px; }
+
+        .btn { padding: 14px 14px; font-size: 15px; border-radius: 10px; }
+
+        .report-card { padding: 16px; border-radius: 14px; }
+        .report-card h3 { font-size: 15px; }
+        .report-item { font-size: 14px; }
+
+        /* Modals */
+        .modal { padding: 0; }
+        .modal-content {
+            width: 100%;
+            height: 100%;
+            max-width: none;
+            max-height: none;
+            border-radius: 0;
+            padding: 14px;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tree-nav {
+            width: 100%;
+            max-height: 34vh;
+            padding: 12px;
+        }
+        .tree-nav h3 { font-size: 14px; padding-bottom: 10px; margin-bottom: 10px; }
+        .tree-list-container { margin-bottom: 10px; }
+        .tree-item { font-size: 13px; padding: 9px; }
+
+        .editor-panel { flex: 1; min-height: 0; }
+        .editor-header-bar { padding-bottom: 10px; margin-bottom: 12px; }
+        .editor-header-bar h2 { font-size: 15px; }
+        .node-box { padding: 14px; border-radius: 12px; }
+        .node-title { font-size: 14px; margin-bottom: 10px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { font-size: 12px; margin-bottom: 6px; }
+        .form-group textarea,
+        .form-group input[type="text"],
+        .form-group select {
+            font-size: 16px;
+            padding: 11px 12px;
+        }
+        .form-group textarea { height: 90px; }
+
+        .branch-item {
+            flex-direction: column;
+            align-items: stretch;
+            padding: 12px;
+            gap: 8px;
+        }
+        .branch-item::before { display: none; }
+        .branch-item input,
+        .branch-item select { font-size: 15px; width: 100%; }
+        .branch-item .del-branch { padding: 9px; font-size: 13px; }
+
+        .prov-grid { grid-template-columns: 1fr; gap: 10px; }
+        .prov-item input { font-size: 15px; padding: 9px 12px; }
+
+        .btn-add { font-size: 13px; padding: 10px 14px; }
+        .btn-save { font-size: 14px; padding: 12px 20px; }
+
+        /* CRM */
+        #crmModal .modal-content { padding: 14px; }
+        #crmModal .crm-list {
+            max-height: none;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .crm-header { font-size: 15px; padding-bottom: 10px; margin-bottom: 12px; }
+        .crm-card { padding: 13px; margin-bottom: 10px; }
+        .crm-name { font-size: 14px; }
+        .crm-row { flex-direction: column; align-items: stretch; gap: 5px; margin-bottom: 8px; }
+        .crm-row label { width: auto; font-size: 12px; }
+        .crm-row select, .crm-row input { font-size: 15px; padding: 9px 10px; }
+        .crm-tags { gap: 5px; }
+        .tag-btn { font-size: 11.5px; padding: 5px 8px; }
+        .crm-memo { font-size: 14px; height: 52px; }
+        .crm-actions { flex-direction: column; }
+        .btn-script {
+            font-size: 13px;
+            padding: 11px;
+            flex: none;
+            width: 100%;
+        }
+
+        /* Admin */
+        #adminModal .modal-content { padding: 18px; }
+        .admin-grid { grid-template-columns: 1fr; }
+        .admin-card { padding: 18px 14px; }
+
+        #toast {
+            font-size: 13px;
+            padding: 10px 18px;
+            top: 12px;
+        }
+    }
+
+    @media (max-width: 375px) {
+        .top-bar h1 { font-size: 15px; }
+        .chat-window { height: 36vh; }
+        .message { font-size: 13px; }
+        .btn { font-size: 14px; padding: 12px 12px; }
+    }
+</style>
+</head>
+<body>
+
+<div id="toast">✅ 话术已复制，可直接粘贴发送</div>
+
+<div class="top-bar">
+    <h1>瑞泽净化 · 销售管理与外呼沙盘</h1>
+    <div id="clientInfoBox" class="top-input-group">
+        <label>客户信息</label>
+        <input type="text" id="clientSurname" placeholder="姓氏(如:薛)">
+        <input type="text" id="clientCompany" placeholder="公司(如:盈安气体)" style="width: 160px;">
+        <select id="clientType" title="客户类型：影响开场白话术">
+            <option value="气站">🏭 气站</option>
+            <option value="工厂">🔧 工厂自用</option>
+        </select>
+    </div>
+    <div class="top-actions">
+        <button class="btn-settings" onclick="openAdmin()">⚙️ 系统后台管理</button>
+    </div>
+</div>
+
+<div class="main-layout">
+    <div class="left-panel">
+        <div class="chat-window" id="chatWindow">
+            <div class="welcome-board" id="welcomeBoard">
+                <h2>📞 销售实战准备就绪</h2>
+                <p>请在顶部填写客户信息，选择下方省份，然后拨出电话。</p>
+            </div>
+        </div>
+
+        <div class="action-panel" id="actionPanel">
+            <div class="action-title">
+                <span id="actionTitle">准备开始通话</span>
+                <button class="btn-hangup" id="hangupBtn" onclick="hangUpCall()">☎️ 强制挂断</button>
+            </div>
+            <div id="tipBox" class="tip-box" style="display:none;"></div>
+            <div id="painTagBox" class="pain-tag-box" style="display:none;">
+                <span class="pain-label">🎯 痛点标记：</span>
+                <span class="pain-tag" data-tag="接高端" onclick="togglePainTag(this)">接高端订单</span>
+                <span class="pain-tag" data-tag="降成本" onclick="togglePainTag(this)">降成本诉求</span>
+                <span class="pain-tag" data-tag="竞品故障" onclick="togglePainTag(this)">竞品设备故障</span>
+                <span class="pain-tag" data-tag="产能扩建" onclick="togglePainTag(this)">产能扩建</span>
+            </div>
+            <div id="regionBox" class="region-selector">
+                <label>目标省份：</label>
+                <select id="provinceSelect"></select>
+            </div>
+            <div class="btn-group" id="btnGroup">
+                <button class="btn sales-btn" onclick="startCall()">📞 拨出电话</button>
+            </div>
+        </div>
+
+        <div class="report-card" id="reportCard">
+            <h3>📊 客户意向度分析报告</h3>
+            <div class="report-item" id="reportLevel"></div>
+            <div class="report-item" id="reportReason"></div>
+            <div class="report-item" id="reportAction"></div>
+        </div>
+    </div>
+</div>
+
+<!-- CRM 独立弹窗 -->
+<div class="modal" id="crmModal">
+    <div class="modal-content">
+        <div class="crm-header">
+            <span>📇 客户跟进中心</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <button style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:13px; font-weight:600; padding:4px 8px; border-radius:6px;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'" onclick="clearCRM()">🗑 清空全部</button>
+                <button style="background:none; border:none; color:#64748b; cursor:pointer; font-size:22px; font-weight:bold; line-height:1; padding:0 4px;" onclick="closeCRM()">✕</button>
+            </div>
+        </div>
+        <div class="crm-list" id="crmList"></div>
+    </div>
+</div>
+
+<!-- 后台管理面板 -->
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <div class="admin-header">
+            <h2>🛠️ 系统后台管理</h2>
+            <button style="background:none; border:none; color:#64748b; font-size:24px; cursor:pointer; line-height:1; padding:0 4px;" onclick="document.getElementById('adminModal').style.display='none'">✕</button>
+        </div>
+        <div class="admin-grid">
+            <div class="admin-card" onclick="document.getElementById('adminModal').style.display='none'; openCRM();">
+                <div class="admin-icon">📇</div>
+                <div class="admin-title">客户跟进中心</div>
+                <div class="admin-desc">查看客户档案、设定回访及自动话术</div>
+            </div>
+            <div class="admin-card" onclick="document.getElementById('adminModal').style.display='none'; openSettings();">
+                <div class="admin-icon">🌳</div>
+                <div class="admin-title">话术与逻辑配置</div>
+                <div class="admin-desc">编辑话术树、节点分支及内部提示</div>
+            </div>
+            <div class="admin-card" onclick="document.getElementById('adminModal').style.display='none'; startDrill();">
+                <div class="admin-icon">🎭</div>
+                <div class="admin-title">演练模式</div>
+                <div class="admin-desc">随机生成虚拟客户，专供新人练手</div>
+            </div>
+            <div class="admin-card" onclick="exportAll();">
+                <div class="admin-icon">📤</div>
+                <div class="admin-title">导出备份</div>
+                <div class="admin-desc">保存所有话术、同行库与客户数据</div>
+            </div>
+            <div class="admin-card" style="grid-column: span 2;" onclick="document.getElementById('importFile').click();">
+                <div class="admin-icon">📥</div>
+                <div class="admin-title">导入数据恢复</div>
+                <div class="admin-desc">从本地 JSON 文件恢复系统数据</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <div class="tree-nav">
+            <h3>话术流程配置</h3>
+            <button class="btn-add" onclick="addNewNode()">➕ 新建独立话术节点</button>
+            <div class="tree-item prov-btn" id="nav_prov" onclick="selectProvinceEditor()">🌍 全国各省同行库</div>
+            <div class="tree-list-container" id="treeNavList"></div>
+            <button class="btn-save" onclick="saveSettings()">💾 保存并生效</button>
+            <button style="background:#fff; color:#64748b; border:1px solid #e2e8f0; padding:12px 24px; border-radius:8px; cursor:pointer; font-size:15px; font-weight:700; width:100%; margin-top:10px;" onclick="closeSettings()">取消</button>
+        </div>
+
+        <div class="editor-panel">
+            <div class="editor-header-bar"><h2 id="editorHeader">节点编辑器</h2></div>
+            <div class="editor-content" id="editorContainer"></div>
+        </div>
+    </div>
+</div>
+
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="importAll(this)">
+
+<script>
+    function getTodayStr() {
+        var d = new Date();
+        return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+    }
+    function showToast(msg) {
+        var toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.style.display = 'block';
+        toast.style.animation = 'none';
+        void toast.offsetHeight;
+        toast.style.animation = '';
+        clearTimeout(window.__toastTimer);
+        window.__toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 2000);
+    }
+    function copyToClipboard(text) {
+        var t = document.createElement("textarea"); t.value = text;
+        document.body.appendChild(t); t.select(); document.execCommand("copy");
+        document.body.removeChild(t); showToast("✅ 跟进话术已复制！");
+    }
+    function openAdmin() {
+        document.getElementById('adminModal').style.display = 'flex';
+    }
+    function openCRM() { document.getElementById('crmModal').style.display = 'flex'; loadCRM(); }
+    function closeCRM() { document.getElementById('crmModal').style.display = 'none'; }
+
+    var currentPainTags = [];
+    function togglePainTag(el) {
+        var tag = el.getAttribute('data-tag');
+        if (currentPainTags.indexOf(tag) === -1) { currentPainTags.push(tag); el.classList.add('active'); }
+        else { currentPainTags = currentPainTags.filter(t => t !== tag); el.classList.remove('active'); }
+    }
+    function resetPainTags() {
+        currentPainTags = [];
+        document.querySelectorAll('.pain-tag').forEach(el => el.classList.remove('active'));
+        var pb = document.getElementById('painTagBox'); if (pb) pb.style.display = 'none';
+        var tb = document.getElementById('tipBox'); if (tb) tb.style.display = 'none';
+    }
+    function renderTip(tip) {
+        var box = document.getElementById('tipBox'); if (!box) return;
+        if (tip && tip.trim() !== '') { box.innerHTML = '💡 销售提示：' + tip; box.style.display = 'block'; }
+        else box.style.display = 'none';
+    }
+    function exportAll() {
+        var data = { version: 'v36', exportDate: new Date().toISOString(), flow: flowData, province: provinceData, crm: JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]') };
+        var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+        var url = URL.createObjectURL(blob); var a = document.createElement('a');
+        a.href = url; a.download = 'ruize_backup_' + getTodayStr() + '.json'; a.click(); URL.revokeObjectURL(url);
+        showToast("✅ 备份已导出");
+    }
+    function importAll(input) {
+        var file = input.files[0]; if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var data = JSON.parse(e.target.result);
+                if (!data.flow || !data.province) { alert("文件格式不正确"); return; }
+                if (!confirm("导入会覆盖当前所有配置和客户数据，确定？")) return;
+                localStorage.setItem('ruizeFlowV34', JSON.stringify(data.flow));
+                localStorage.setItem('ruizeProvV34', JSON.stringify(data.province));
+                localStorage.setItem('ruizeCRM_v34', JSON.stringify(data.crm || []));
+                alert("✅ 导入成功，点击确定后刷新页面"); location.reload();
+            } catch(err) { alert("解析失败：" + err.message); }
+        };
+        reader.readAsText(file); input.value = '';
+    }
+
+    var allProvinces = ["北京", "天津", "河北", "山西", "内蒙古", "辽宁", "吉林", "黑龙江", "上海", "江苏", "浙江", "安徽", "福建", "江西", "山东", "河南", "湖北", "湖南", "广东", "广西", "海南", "重庆", "四川", "贵州", "云南", "西藏", "陕西", "甘肃", "青海", "宁夏", "新疆", "台湾", "香港", "澳门"];
+
+    var defaultFlow = {
+        "开场白": {
+            text: "[姓氏]总，您好！我是瑞泽净小薛，主要做气体纯化设备的。全国合作气站挺多，像咱们[地区]这边，[同行1]、[同行2]、[同行3]都有装我们的设备。这次打电话给您，主要是想了解下，您这边目前有没有上纯化设备的需求？现在市场上客户对咱们工业气体的纯度要求越来越高了，尤其今年氩气新国标出台，很多气站也在提前布局气源品质升级，您这边是什么想法呢？",
+            tip: "语速放慢，30秒内说完。听到背景嘈杂/语气犹豫，立刻准备切【不是负责人】。核心目标是让客户愿意多聊20秒，先拿'有没有需求'这个信息。",
+            branches: [
+                { text: "“你们设备多少钱？”（直接问价）", target: "直接问价" },
+                { text: "“我们原液就是5个9的高纯，不需要纯化！”", target: "炫耀原液" },
+                { text: "“我们已经在用别家的纯化设备了。”", target: "已在用竞品" },
+                { text: "“我这边不是采购，你找老板。”", target: "不是负责人" },
+                { text: "“暂时没有这个需求 / 我们纯度没问题。”", target: "拒绝观望" }
+            ]
+        },
+        "不是负责人": {
+            text: "好的，了解。那请问贵司负责设备采购的总，贵姓？方便提供一下手机号吗？或者我什么时间打过来找老板比较合适？",
+            tip: "对员工要客气，别让对方有压力。目标是拿到【老板称呼+手机号+合适时间】三要素，能拿两个就是胜利。",
+            branches: [
+                { text: "“不方便给老板联系方式。”", target: "B类-拿到间接线索" },
+                { text: "“老板下午在，下午再打。”", target: "C类-预约回电" },
+                { text: "“行，我给你老板微信/手机号。”", target: "加微信" }
+            ]
+        },
+        "已在用竞品": {
+            text: "明白，咱们现在用的哪家设备？实际使用下来纯度、再生耗材这块感觉怎么样？很多客户在用别家，后期耗材贵、纯度波动，会考虑做对比选型。",
+            tip: "先问品牌，再问痛点。听到'耗材贵''纯度波动''经常维修'，切【嫌贵算账】；听到'用的挺好'，别硬攻，走【争取加微信】软着陆。",
+            branches: [
+                { text: "“现在用的挺好，先不考虑。”", target: "争取加微信" },
+                { text: "“耗材太贵，经常出问题。”", target: "嫌贵算账" },
+                { text: "“可以，发点资料对比看看。”", target: "加微信" }
+            ]
+        },
+        "直接问价": {
+            text: "看您这边需求，我们一般给气站配的都是高压直充型，有50方、200方、300方，价格4万~9万不等。不过具体要看您的配置要求。您这边计划想要一小时充多少瓶的，或者预算大概在什么范围？要不我加下您微信，给您发份资料了解一下，到时候按您需求，我再帮您推荐个合适的类型。",
+            tip: "报区间不报底价。核心是【先探需求规模（每小时充瓶量），再谈价格】。切忌一上来报底价。",
+            branches: [
+                { text: "“太贵了，别家便宜很多。”", target: "嫌贵算账" },
+                { text: "“你们工艺怎么样？耗材能用多久？”", target: "问技术" },
+                { text: "“今年没预算，等等再说。”", target: "预算不足" },
+                { text: "“你们售后怎么样？故障率高不高？”", target: "售后担忧" },
+                { text: "“能不能先试用一下？”", target: "要求试用" },
+                { text: "可以（加微信）", target: "加微信" }
+            ]
+        },
+        "炫耀原液": {
+            text: "明白了[姓氏]总。既然咱们用的是5个9的高纯原液，说明[公司]在原料把控上是非常严格的。不过很多大站之所以在充装端再加一台纯化设备，主要是为了防范充装环节的二次污染。咱们这台设备，就是给您的原液做最后一道精准过滤，确保每一瓶交到终端客户手里纯度都稳稳在6个9以上。这样您拿着检测数据去接高端单子，底气足，利润也高。您觉得呢？",
+            tip: "强调【充装环节二次污染】这个核心痛点。如果客户说'高端单子少'，别硬推，转观望维持关系。",
+            branches: [
+                { text: "“加个设备又得多花钱吧？”", target: "嫌贵算账" },
+                { text: "“我们纯度够用，高端单子很少。”", target: "拒绝观望" },
+                { text: "“行，你加我微信，发点案例看看。”", target: "加微信" }
+            ]
+        },
+        "拒绝观望": {
+            text: "那说明咱们[公司]品质把控得好。不过现在纯度没问题，不代表以后一直没问题。外购液氩批次有波动，设备用久了吸附剂也会老化，很多气站是被高端客户抽检退货了才发现。您平时有遇到要求6个9超纯气的单子吗？",
+            tip: "别硬推。目标是把'现在没需求'转成'以后有需求先想起我们'。能加微信就是胜利。听到'不需要别再打'立刻切【明确拒绝】。",
+            branches: [
+                { text: "“以后再说吧。”", target: "争取加微信" },
+                { text: "“你们工艺怎么样？”", target: "问技术" },
+                { text: "“不需要，别再打电话了。”", target: "明确拒绝" }
+            ]
+        },
+        "嫌贵算账": {
+            text: "理解。但咱们算笔账，您外购高纯气每瓶多花几十块，用咱们设备自己提纯，不到一年省下的气体差价就把设备钱赚回来了。",
+            tip: "重点强调：耗材寿命、航天案例、本地同行回本实例。不要过度纠缠设备报价。客户反复压价时，【可停留本节点循环拉扯】。",
+            branches: [
+                { text: "“那你帮我算算多久能回本？”", target: "加微信" },
+                { text: "“还是太贵了，再便宜点。”", target: "嫌贵算账" },
+                { text: "“人家江苏的才四五万，你们凭什么这么贵？”", target: "亮底牌" },
+                { text: "“再等等，先不考虑。”", target: "争取加微信" }
+            ]
+        },
+        "亮底牌": {
+            text: "[姓氏]总，您看下我们的业绩表。像您这边的[同行1]、[同行2]用的都是咱们的设备。另外像中科院金属研究所、中国航天用的也是我们的。连航天军工级别的纯度我们都能保，气站提纯对咱们来说是大材小用。",
+            tip: "亮出航天/中科院案例，制造'低端用不起'的心理落差，但语气要平和。本地同行案例优先讲。",
+            branches: [
+                { text: "“行吧，你把业绩表发我微信看看。”", target: "加微信" }
+            ]
+        },
+        "问技术": {
+            text: "我们用的是分级纯化：先脱氧、脱甲烷，再吸附水分和二氧化碳。两级处理，纯度更稳定。干燥器能处理10000多瓶才需再生，吸附剂寿命好几年。您目前用的设备多久再生一次？",
+            tip: "讲工艺讲数字（两级处理、10000瓶再生周期），用具体参数建立专业感。结尾一定要反问一句。",
+            branches: [
+                { text: "“听上去可以，你加我微信发资料看看。”", target: "加微信" }
+            ]
+        },
+        "预算不足": {
+            text: "理解，很多气站都是先做方案，等明年预算。我可以把测算方案发给您，您留存，等预算下来直接参考。也可以看看后期改造分期方案。",
+            tip: "不逼单，先做'方案供应商'占位。分期付款/后期改造是重要卖点。目标：拿到加微。",
+            branches: [
+                { text: "“行，资料发我看看。”", target: "加微信" },
+                { text: "“算了，今年不考虑。”", target: "争取加微信" }
+            ]
+        },
+        "售后担忧": {
+            text: "这个您放心。我们设备在国内有几百套在跑，故障率很低。售后是本地工程师上门，常用配件都有库存，48小时响应。像咱们省的[同行1]用了三年多，基本没出过问题。",
+            tip: "用【本地同行案例】做背书，比讲公司规模更有说服力。强调'48小时响应'这个具体承诺。",
+            branches: [
+                { text: "“那你们设备多少钱？”", target: "直接问价" },
+                { text: "“行，发点售后资料看看。”", target: "加微信" }
+            ]
+        },
+        "要求试用": {
+            text: "可以的。我们在您这个区域有合作客户，可以安排您去实地看设备运行情况，或者寄一台小样机给您测纯度。您看是安排参观还是寄样机？",
+            tip: "试用诉求是【高意向信号】，千万别拒绝。优先安排'参观合作客户'（成本低、成交率高）。",
+            branches: [
+                { text: "“先寄样机试试吧。”", target: "加微信" },
+                { text: "“安排参观吧。”", target: "加微信" }
+            ]
+        },
+        "争取加微信": {
+            text: "好的，理解。那方便加您个微信吗？这样后续有需求，或者设备使用上有任何问题，我也能第一时间为您提供一些技术上的参考建议。",
+            tip: "这是最后一道加微机会。语气轻松，不要给压力。客户说'行'，直接走加微信；客户拒绝，立刻切【委婉收尾】礼貌收场，不要纠缠。",
+            branches: [
+                { text: "“行吧，加个微信。”", target: "加微信" },
+                { text: "“不用了 / 不需要。”", target: "委婉收尾" }
+            ]
+        },
+        "委婉收尾": {
+            text: "那打扰您了，过段时间再联系您。我们工厂就在湖北咸宁，有机会路过也欢迎您来我们工厂参观考察。祝您生意兴隆！",
+            tip: "留下工厂地址作为钩子，客户以后有需求会想起。本通电话结束，标记C类观望，7天后微信/短信轻触达即可。",
+            branches: [
+                { text: "✅ 结束通话", target: "观望结束" }
+            ]
+        },
+        "明确拒绝": {
+            text: "好的[姓氏]总，理解。那我不打扰您了，祝您生意兴隆。如果以后有需要随时联系我。",
+            tip: "客户明确拒绝时【立刻停止推销】，礼貌收尾。标记D类，后续只做朋友圈覆盖，不再主动电话。",
+            branches: [
+                { text: "✅ 结束通话，标记D类", target: "D类-明确拒绝" }
+            ]
+        },
+        "加微信": {
+            text: "好的[姓氏]总，那我马上加您微信。我把详细参数和投资回报测算表发您。您先看一眼，有问题随时找我。",
+            tip: "加微信前先确认手机号就是微信号，避免加不上。",
+            branches: [
+                { text: "✅ 成功加微，锁定A类客户", target: "成功结束" }
+            ]
+        },
+        "成功结束": { isEnd: true, level: "A", reason: "客户成功同意加微信，属于极高质量客户。", action: "1小时内发送资料，3天后语音跟进。" },
+        "B类-竞品用户": { isEnd: true, level: "B", reason: "客户在用竞品，对产品有认知，有转化潜力。", action: "7天后发对比案例，2周后回访。" },
+        "B类-拿到间接线索": { isEnd: true, level: "B", reason: "对接非负责人，拿到决策人信息。", action: "优先拨打决策人，3天跟进。" },
+        "B类-价格顾虑": { isEnd: true, level: "B", reason: "客户对价格有顾虑，未完全拒绝。", action: "3天后发分期/简配方案，7天回访。" },
+        "观望结束": { isEnd: true, level: "C", reason: "客户当下无需求，已礼貌收尾留钩子。", action: "每周朋友圈/短信轻触达，有需求再跟进。" },
+        "C类-预约回电": { isEnd: true, level: "C", reason: "约定指定时间再次打电话。", action: "设置CRM下次跟进日期为约定时间。" },
+        "D类-明确拒绝": { isEnd: true, level: "D", reason: "客户明确拒绝，要求不要再打电话。", action: "标记流失，不再主动电话，仅朋友圈覆盖。" }
+    };
+
+    var realData = {
+        "河北": "大名县东润气体、保定端恒气体、邢台国献气体、石家庄福利乙炔气厂",
+        "山西": "山西晋城安恒智、山西运城东鑫氩气站、山西盂县钰杰气体",
+        "内蒙古": "内蒙武川县宏峰气业、赤峰吉泰工业气体",
+        "辽宁": "沈阳丹东黄海动力气体、营口东兴气体、营口金鹏气体",
+        "黑龙江": "哈尔滨鼎新工业气体、哈尔滨黎明气体",
+        "江苏": "常州武进华阳气体、南京立业气体、扬州连心气体、扬州创新气体、徐州劲鹏气体、无锡华盛气体",
+        "浙江": "浙江欧特森气体、杭州临安气体、宁波方迪新能源、绍兴富源特气",
+        "安徽": "安庆六方气体、天长市天鑫气体、芜湖仁龙特气、马鞍山新桦气体、庐江县通达气体、霍山忠祥气体",
+        "福建": "福建莆田黄石制氧厂、福建罗源顺发气体、福建融航气体",
+        "江西": "江西新余凯尉气体",
+        "山东": "山东天海气体、诸城广源气体、临沂盈安气体、淄博桓台瑞丰气体、淄博锦庄气体、青岛宝发物资",
+        "河南": "河南安阳安科实用气体、汤阴锦利胜气体、河南洛阳万科气体、长垣市大车气体、荥阳市兴华气体、清丰县宏升气体",
+        "湖北": "武汉同和气体、宜昌得心气体、荆门华强气体、湖北弘安气体、阳逻国跃气体、武汉华尔文气体",
+        "湖南": "湖南九山半导体、益阳中大气体、宁乡中胜气体、宁乡腾达气体、岳阳畅安气体、湖南顶立科技、长沙长钢气体",
+        "广东": "广东阳江同德气体、深圳伽玛纳米、亚浩电子五金、佛山中研非晶、东莞速迈德电子",
+        "广西": "广西南宁市卓越气体",
+        "海南": "海南锋利气体",
+        "重庆": "重庆圣马气体、重庆大学、重庆特瑞元新材料",
+        "四川": "四川均腾气体、绵阳瑞联特、成都温江凯力气体、眉山彭山鑫源气体、遂宁广润氧气",
+        "贵州": "贵州福泉松植气体、贵州贵而安气体、贵州黔南永峰气体、贵州梅岭电源",
+        "云南": "云南安锋气体、云南富宁县富翔气体、云南通海广文气体",
+        "陕西": "陕西纳博盛源气体、陕西临渭永安气体、宝鸡宝光气体",
+        "甘肃": "甘肃瓜州县盛权工贸、甘肃嘉峪关爱国兴业气体、酒泉顺鑫气体、酒泉市荣祥制氧",
+        "宁夏": "宁夏银北气体、宁夏银川市宁东华龙化工、宁夏石嘴山市宏顺通达化工、中卫市金源工贸",
+        "新疆": "新疆天瑞达工业气体、新疆晟达恒源气体、新疆天合优气体、阜康市东昇工贸"
+    };
+
+    var neighborMap = {
+        "北京": ["河北", "天津"], "天津": ["河北", "北京"], "上海": ["江苏", "浙江"],
+        "吉林": ["辽宁", "黑龙江", "内蒙古"], "西藏": ["青海", "四川", "新疆"],
+        "青海": ["甘肃", "西藏", "新疆"], "台湾": ["福建", "广东"],
+        "香港": ["广东"], "澳门": ["广东"]
+    };
+
+    function getPeersWithSource(province, visited) {
+        visited = visited || [];
+        if (visited.indexOf(province) > -1) return { raw: "", from: "" };
+        visited.push(province);
+        var raw = realData[province];
+        if (raw && raw.trim() !== "") return { raw: raw, from: province };
+        var neighbors = neighborMap[province];
+        if (neighbors) {
+            for (var i = 0; i < neighbors.length; i++) {
+                var found = getPeersWithSource(neighbors[i], visited);
+                if (found.raw && found.raw.trim() !== "") return found;
+            }
+        }
+        return { raw: "", from: "" };
+    }
+    function getPeers(province) { return getPeersWithSource(province).raw; }
+    function parsePeers(province) {
+        var raw = getPeers(province);
+        if (!raw || raw.trim() === "") return [];
+        return raw.split(/[、,，\s]+/).filter(item => item.trim() !== "").sort(() => 0.5 - Math.random());
+    }
+
+    var provinceData = JSON.parse(localStorage.getItem('ruizeProvV34') || JSON.stringify(realData));
+    var flowData = JSON.parse(localStorage.getItem('ruizeFlowV34') || JSON.stringify(defaultFlow));
+
+    // 自动迁移：工厂版开场白
+    if (flowData['开场白'] && !flowData['开场白'].textFactory) {
+        flowData['开场白'].textFactory = "[姓氏]总，您好！我是瑞泽净小薛，主要做气体纯化设备的。像咱们[地区]这边不少做金属加工、电子、化工的工厂，自己配制氮机或者外购液氮，纯度老不稳定，或者外购成本高。想跟您了解下，您这边工厂用气是自己制还是外购？目前纯度要求是多少个9？";
+        localStorage.setItem('ruizeFlowV34', JSON.stringify(flowData));
+    }
+
+    // 自动迁移 v36
+    if (!flowData['争取加微信']) {
+        flowData['争取加微信'] = {
+            text: "好的，理解。那方便加您个微信吗？这样后续有需求，或者设备使用上有任何问题，我也能第一时间为您提供一些技术上的参考建议。",
+            tip: "这是最后一道加微机会。语气轻松，不要给压力。客户说'行'，直接走加微信；客户拒绝，立刻切【委婉收尾】礼貌收场，不要纠缠。",
+            branches: [
+                { text: "“行吧，加个微信。”", target: "加微信" },
+                { text: "“不用了 / 不需要。”", target: "委婉收尾" }
+            ]
+        };
+        flowData['委婉收尾'] = {
+            text: "那打扰您了，过段时间再联系您。我们工厂就在湖北咸宁，有机会路过也欢迎您来我们工厂参观考察。祝您生意兴隆！",
+            tip: "留下工厂地址作为钩子，客户以后有需求会想起。本通电话结束，标记C类观望，7天后微信/短信轻触达即可。",
+            branches: [ { text: "✅ 结束通话", target: "观望结束" } ]
+        };
+        var softFix = [
+            { node: '拒绝观望', match: '以后再说吧' },
+            { node: '嫌贵算账', match: '再等等，先不考虑' },
+            { node: '预算不足', match: '算了，今年不考虑' },
+            { node: '已在用竞品', match: '现在用的挺好' }
+        ];
+        softFix.forEach(function(fix) {
+            if (flowData[fix.node] && flowData[fix.node].branches) {
+                flowData[fix.node].branches.forEach(function(b) {
+                    if (b.text.indexOf(fix.match) > -1) b.target = '争取加微信';
+                });
+            }
+        });
+        localStorage.setItem('ruizeFlowV34', JSON.stringify(flowData));
+    }
+
+    var provSelect = document.getElementById('provinceSelect');
+    allProvinces.forEach(function(prov) {
+        var opt = document.createElement('option');
+        opt.value = prov; opt.innerText = prov;
+        provSelect.appendChild(opt);
+    });
+
+    var chatWindow = document.getElementById('chatWindow');
+    var btnGroup = document.getElementById('btnGroup');
+    var actionTitle = document.getElementById('actionTitle');
+    var welcomeBoard = document.getElementById('welcomeBoard');
+    var hangupBtn = document.getElementById('hangupBtn');
+
+    var currentSurname = "王";
+    var currentCompany = "XX气体";
+    var currentProvince = "山东";
+    var isCalling = false;
+    var isFinished = false;
+    var currentClientType = "气站";
+    var lastClientObjection = "";
+
+    function loadCRM() {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var list = document.getElementById('crmList');
+        var today = getTodayStr();
+        if(crmData.length === 0) {
+            list.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:48px 20px; font-size:14px;">暂无客户档案<br><span style="font-size:12px; opacity:0.7;">打通电话后自动生成</span></div>';
+            return;
+        }
+        list.innerHTML = '';
+        crmData.sort((a, b) => {
+            if(!a.nextDate) return 1;
+            if(!b.nextDate) return -1;
+            return new Date(a.nextDate) - new Date(b.nextDate);
+        });
+        crmData.forEach(function(cust) {
+            var levelColor = cust.level === 'A' ? '#ef4444' : (cust.level === 'B' ? '#f59e0b' : (cust.level === 'C' ? '#3b82f6' : '#64748b'));
+            var isOverdue = cust.nextDate && cust.nextDate <= today && cust.status !== '已成交' && cust.status !== '已流失';
+            var cardClass = isOverdue ? 'crm-card overdue' : 'crm-card';
+            var div = document.createElement('div');
+            div.className = cardClass;
+            var tags = cust.tags || [];
+            var tagList = ['接高端', '降成本', '竞品故障', '产能扩建'];
+            var tagsHtml = tagList.map(t => `<span class="tag-btn ${tags.includes(t)?'active':''}" onclick="toggleTag('${cust.company}', '${cust.surname}', '${t}')">${t}</span>`).join('');
+            var provTag = cust.province ? `<span class="crm-tag-prov">${cust.province}</span>` : '';
+            var typeTag = cust.clientType ? `<span class="crm-tag-prov" style="background:#dbeafe; color:#1e40af;">${cust.clientType}</span>` : '';
+            div.innerHTML = `
+                <div class="crm-card-top">
+                    <span class="crm-name">${provTag}${typeTag}${cust.company} - ${cust.surname}总</span>
+                    <span class="crm-level" style="background:${levelColor}">${cust.level}类</span>
+                </div>
+                <div class="crm-row">
+                    <label>跟进状态：</label>
+                    <select onchange="updateCRM('${cust.company}', '${cust.surname}', 'status', this.value)">
+                        <option value="待跟进" ${cust.status==='待跟进'?'selected':''}>🟡 待跟进</option>
+                        <option value="已发资料" ${cust.status==='已发资料'?'selected':''}>🔵 已发资料</option>
+                        <option value="已成交" ${cust.status==='已成交'?'selected':''}>🟢 已成交</option>
+                        <option value="已流失" ${cust.status==='已流失'?'selected':''}>🔴 已流失</option>
+                    </select>
+                </div>
+                <div class="crm-row">
+                    <label>下次跟进：</label>
+                    <input type="date" value="${cust.nextDate || ''}" onchange="updateCRM('${cust.company}', '${cust.surname}', 'nextDate', this.value)">
+                </div>
+                <div class="crm-tags">${tagsHtml}</div>
+                <textarea class="crm-memo" placeholder="备忘..." onchange="updateCRM('${cust.company}', '${cust.surname}', 'memo', this.value)">${cust.memo || ''}</textarea>
+                <div class="crm-actions">
+                    <button class="btn-script" onclick="genScript('${cust.company}', '${cust.surname}', '${cust.province || '山东'}', 'sendInfo')">📁 发资料</button>
+                    <button class="btn-script" onclick="genScript('${cust.company}', '${cust.surname}', '${cust.province || '山东'}', 'closeDeal')">💰 嫌贵逼单</button>
+                    <button class="btn-script" onclick="genScript('${cust.company}', '${cust.surname}', '${cust.province || '山东'}', 'invite')">📞 邀约面谈</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function saveToCRM(level, reason, nextDateOverride) {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var existingIndex = crmData.findIndex(c => c.company === currentCompany && c.surname === currentSurname);
+        if (existingIndex > -1) {
+            crmData[existingIndex].level = level;
+            crmData[existingIndex].reason = reason;
+            crmData[existingIndex].province = currentProvince;
+            crmData[existingIndex].clientType = currentClientType;
+            crmData[existingIndex].lastObjection = lastClientObjection || crmData[existingIndex].lastObjection || '';
+            var oldTags = crmData[existingIndex].tags || [];
+            currentPainTags.forEach(t => { if (oldTags.indexOf(t) === -1) oldTags.push(t); });
+            crmData[existingIndex].tags = oldTags;
+            if (nextDateOverride) crmData[existingIndex].nextDate = nextDateOverride;
+            else if(!crmData[existingIndex].nextDate) {
+                var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+                crmData[existingIndex].nextDate = tomorrow.toISOString().split('T')[0];
+            }
+        } else {
+            var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+            crmData.unshift({
+                surname: currentSurname, company: currentCompany, province: currentProvince,
+                clientType: currentClientType,
+                level: level, reason: reason,
+                lastObjection: lastClientObjection || '',
+                status: level === 'D' ? "已流失" : "待跟进",
+                nextDate: nextDateOverride || (level === 'D' ? "" : tomorrow.toISOString().split('T')[0]),
+                tags: currentPainTags.slice(), memo: ""
+            });
+        }
+        localStorage.setItem('ruizeCRM_v34', JSON.stringify(crmData));
+        loadCRM();
+    }
+
+    function updateCRM(company, surname, field, value) {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var realIndex = crmData.findIndex(c => c.company === company && c.surname === surname);
+        if (realIndex > -1) {
+            crmData[realIndex][field] = value;
+            localStorage.setItem('ruizeCRM_v34', JSON.stringify(crmData));
+            if(field === 'status' || field === 'nextDate') loadCRM();
+        }
+    }
+
+    function toggleTag(company, surname, tag) {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var realIndex = crmData.findIndex(c => c.company === company && c.surname === surname);
+        if(realIndex > -1) {
+            var tags = crmData[realIndex].tags || [];
+            if(tags.includes(tag)) tags = tags.filter(t => t !== tag);
+            else tags.push(tag);
+            crmData[realIndex].tags = tags;
+            localStorage.setItem('ruizeCRM_v34', JSON.stringify(crmData));
+            loadCRM();
+        }
+    }
+
+    function genScript(company, surname, province, type) {
+        var crmData = JSON.parse(localStorage.getItem('ruizeCRM_v34') || '[]');
+        var cust = crmData.find(c => c.company === company && c.surname === surname) || {};
+        var painTags = cust.tags || [];
+        var painStr = painTags.length > 0 ? painTags.join('、') : '';
+        var objection = (cust.lastObjection || '').replace(/[“”"]/g, '').trim();
+        var cType = cust.clientType || '气站';
+        var peers = parsePeers(province);
+        var peer1 = peers[0] || "当地同行";
+        var script = "";
+
+        if (type === 'sendInfo') {
+            var painHint = painStr ? `，了解到您这边主要关注【${painStr}】` : '';
+            script = `${surname}总您好，我是瑞泽净化的小薛。今天跟您电话沟通得很愉快${painHint}。这是我们${cType === '工厂' ? '工厂用气' : '气站充装'}纯化设备的详细参数和落地案例（像咱们省的${peer1}都在用），您先抽空看一眼。有任何技术问题随时找我！`;
+        } else if (type === 'closeDeal') {
+            var objHint = objection ? `您上次提到的"${objection}"，我们这边已经做了针对性方案。` : '';
+            var painClose = painStr ? `特别是针对您关注的【${painStr}】，` : '';
+            script = `${surname}总，上次咱们聊到设备价格，我知道您对预算有考量。${objHint}${painClose}咱们算笔账：用咱们设备自己提纯，一瓶气省下几十块，不到一年设备钱就赚回来了。像您这边的${peer1}也是这么算账的，早买早省钱。您看这周我给您安排个视频连线，把回本账再给您算细一点？`;
+        } else if (type === 'invite') {
+            var painInvite = painStr ? `，针对您关注的【${painStr}】` : '';
+            script = `${surname}总，为了给您出具最精准的选型方案${painInvite}，我想安排咱们技术总工去您${cType === '工厂' ? '厂里' : '站里'}实地测一下气体纯度，看看管道布局。也就占用您二十分钟，您看这周四还是周五方便？`;
+        }
+        copyToClipboard(script);
+    }
+
+    function clearCRM() {
+        if(confirm("确定要清空所有客户档案吗？此操作不可逆！")) {
+            localStorage.removeItem('ruizeCRM_v34');
+            loadCRM();
+        }
+    }
+
+    function appendMessage(text, sender) {
+        if(!text) return;
+        var div = document.createElement('div');
+        div.className = 'message ' + sender;
+        div.innerText = text;
+        div.onclick = function() {
+            copyToClipboard(text);
+            this.style.color = "#22c55e";
+            setTimeout(() => { this.style.color = ""; }, 300);
+        };
+        chatWindow.appendChild(div);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        if (sender === 'client') lastClientObjection = text;
+    }
+
+    function resetCall() {
+        chatWindow.innerHTML = '';
+        chatWindow.appendChild(welcomeBoard);
+        welcomeBoard.style.display = 'flex';
+        document.getElementById('reportCard').style.display = 'none';
+        document.getElementById('actionPanel').style.display = 'block';
+        hangupBtn.style.display = 'none';
+        actionTitle.innerText = "准备开始通话";
+        btnGroup.innerHTML = '<button class="btn sales-btn" onclick="startCall()">📞 拨出电话</button>';
+        isCalling = false;
+        isFinished = false;
+        resetPainTags();
+    }
+
+    function startCall() {
+        currentSurname = document.getElementById('clientSurname').value.trim() || "王";
+        currentCompany = document.getElementById('clientCompany').value.trim() || "XX气体";
+        currentProvince = provSelect.value;
+        currentClientType = document.getElementById('clientType').value;
+        lastClientObjection = "";
+        chatWindow.innerHTML = '';
+        welcomeBoard.style.display = 'none';
+        hangupBtn.style.display = 'block';
+        isCalling = true;
+        isFinished = false;
+        resetPainTags();
+        document.getElementById('painTagBox').style.display = 'flex';
+        loadNode('开场白');
+    }
+
+    function hangUpCall() {
+        if(!isCalling) return;
+        isCalling = false;
+        hangupBtn.style.display = 'none';
+        btnGroup.innerHTML = '';
+        actionTitle.innerText = "通话已结束";
+        setTimeout(function() { finishCall("D", "强行挂断", "3天后发微信"); }, 500);
+    }
+
+    window.loadNode = function(nodeId) {
+        if(!isCalling || isFinished) return;
+        var node = flowData[nodeId];
+        if (!node) { finishCall("C", "未找到该节点，可能已被删除", "检查话术库"); return; }
+        var peers = parsePeers(currentProvince);
+        var useText = (currentClientType === '工厂' && node.textFactory) ? node.textFactory : node.text;
+        var finalText = useText
+            .replace(/\[姓氏\]/g, currentSurname)
+            .replace(/\[公司\]/g, currentCompany)
+            .replace(/\[地区\]/g, currentProvince)
+            .replace(/\[客户类型\]/g, currentClientType)
+            .replace(/\[同行1\]/g, peers[0] || "")
+            .replace(/\[同行2\]/g, peers[1] || "")
+            .replace(/\[同行3\]/g, peers[2] || "");
+        if (finalText) appendMessage(finalText, "sales");
+        renderTip(node.tip);
+
+        if (node.isEnd) {
+            finishCall(node.level, node.reason, node.action);
+            return;
+        }
+
+        actionTitle.innerText = "客户回复：";
+        btnGroup.innerHTML = '';
+        if (node.branches) {
+            node.branches.forEach(function(branch) {
+                var btn = document.createElement('button');
+                btn.className = 'btn client-btn';
+                btn.innerText = branch.text;
+                btn.onclick = function() {
+                    if(!isCalling || isFinished) return;
+                    appendMessage(branch.text, "client");
+
+                    var txt = branch.text;
+                    if (txt.includes("✅") || txt.includes("结束通话") || txt.includes("成功加微")) {
+                        var lvl = txt.includes("D类") ? "D" : "C";
+                        var rsn = lvl === "D" ? "客户明确拒绝" : "客户暂时无需求，礼貌结束";
+                        var act = lvl === "D" ? "不再主动电话" : "定期微信轻触达";
+                        finishCall(lvl, rsn, act);
+                        return;
+                    }
+
+                    if (txt.includes("老板下午在") || txt.includes("不方便给") || txt.includes("我给你老板")) {
+                        finishCall("C", "预约外呼 / 拿到线索", "按约定时间回访");
+                        return;
+                    }
+
+                    window.loadNode(branch.target);
+                };
+                btnGroup.appendChild(btn);
+            });
+        }
+    };
+
+    function finishCall(level, reason, action) {
+        if(isFinished) return;
+        isFinished = true;
+        isCalling = false;
+        hangupBtn.style.display = 'none';
+
+        var customNextDate = "";
+        if ((action && action.indexOf('约定') > -1) || (reason && reason.indexOf('预约') > -1) || (reason && reason.indexOf('回电') > -1)) {
+            var d = new Date(); d.setDate(d.getDate() + 3);
+            var def = d.toISOString().split('T')[0];
+            var input = prompt("客户预约回电，请输入约定日期 (YYYY-MM-DD)：", def);
+            if (input && /^\d{4}-\d{2}-\d{2}$/.test(input.trim())) customNextDate = input.trim();
+        }
+
+        document.getElementById('reportCard').style.display = 'block';
+        var reportCard = document.getElementById('reportCard');
+        var colorMap = {'A': '#ef4444', 'B': '#f59e0b', 'C': '#3b82f6', 'D': '#64748b'};
+        reportCard.style.borderTopColor = colorMap[level] || '#64748b';
+
+        document.getElementById('reportLevel').innerHTML = '🎯 客户等级：<strong style="color:' + (colorMap[level]||'#64748b') + '; font-size: 24px;">' + level + ' 类客户</strong>';
+        document.getElementById('reportReason').innerHTML = '💡 判定依据：' + reason;
+        document.getElementById('reportAction').innerHTML = '📅 跟进建议：<strong>' + action + '</strong>' +
+            (customNextDate ? '<br>⏰ 已设置回电提醒：<strong style="color:#ef4444;">' + customNextDate + '</strong>' : '');
+
+        saveToCRM(level, reason, customNextDate);
+
+        document.getElementById('actionPanel').style.display = 'block';
+        actionTitle.innerText = "✅ 客户已归档入库";
+
+        btnGroup.innerHTML = `
+            <button class="btn" style="text-align:center; background:linear-gradient(135deg,#22c55e,#16a34a); color:white; border:none; font-size:17px; padding:18px; font-weight:800; border-radius:12px; box-shadow: 0 8px 20px -8px rgba(34,197,94,0.6); width:100%; cursor:pointer; margin-top:10px; letter-spacing:0.02em;" onclick="resetCall()">
+                🔄 开始下一通电话
+            </button>
+        `;
+
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function openSettings() {
+        document.getElementById('settingsModal').style.display = 'flex';
+        renderTreeNav();
+        selectNode('开场白');
+    }
+
+    function renderTreeNav() {
+        var nav = document.getElementById('treeNavList');
+        nav.innerHTML = '';
+        var targetNodes = [];
+        for(var k in flowData) {
+            if(flowData[k].branches) {
+                flowData[k].branches.forEach(b => { if(b.target) targetNodes.push(b.target); });
+            }
+        }
+        for(var key in flowData) {
+            if (targetNodes.includes(key) && key !== '开场白') continue;
+            var wrapper = document.createElement('div');
+            wrapper.className = 'tree-node';
+            var item = document.createElement('div');
+            item.className = 'tree-item';
+            item.id = 'nav_' + key.replace(/\s/g, '');
+            var hasChildren = flowData[key].branches && flowData[key].branches.length > 0;
+            var toggleIcon = hasChildren ? '<span class="tree-toggle" onclick="toggleTree(this)">▼</span>' : '<span class="tree-toggle"></span>';
+            item.innerHTML = `<div style="display:flex; align-items:center; flex:1;">${toggleIcon}<span class="tree-title">${key}</span></div><span class="tree-delete" onclick="deleteNode(event, '${key}')">✖</span>`;
+            item.onclick = function(k) { return function(e) {
+                if(e.target.className !== 'tree-delete') selectNode(k);
+            }; }(key);
+            wrapper.appendChild(item);
+            if (hasChildren) {
+                var childContainer = document.createElement('div');
+                childContainer.className = 'tree-children';
+                var renderedTargets = [];
+                flowData[key].branches.forEach(b => {
+                    if(b.target && !renderedTargets.includes(b.target)) {
+                        renderedTargets.push(b.target);
+                        var childNode = document.createElement('div');
+                        childNode.className = 'tree-item';
+                        childNode.id = 'nav_' + b.target.replace(/\s/g, '');
+                        childNode.innerHTML = `<span class="tree-title">↳ ${b.target}</span>`;
+                        childNode.onclick = function(t) { return function(e) { e.stopPropagation(); selectNode(t); }; }(b.target);
+                        childContainer.appendChild(childNode);
+                    }
+                });
+                wrapper.appendChild(childContainer);
+            }
+            nav.appendChild(wrapper);
+        }
+    }
+
+    function toggleTree(el) {
+        var children = el.closest('.tree-node').querySelector('.tree-children');
+        if(children) {
+            if(children.classList.contains('collapsed')) {
+                children.classList.remove('collapsed');
+                el.innerText = '▼';
+            } else {
+                children.classList.add('collapsed');
+                el.innerText = '▶';
+            }
+        }
+    }
+
+    function selectNode(nodeId) {
+        document.getElementById('nav_prov').classList.remove('active');
+        document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+        var navItems = document.querySelectorAll('.tree-item');
+        navItems.forEach(el => {
+            if(el.innerText.includes(nodeId)) el.classList.add('active');
+        });
+        document.getElementById('editorHeader').innerText = "节点编辑器：" + nodeId;
+        var container = document.getElementById('editorContainer'); container.innerHTML = '';
+        var node = flowData[nodeId];
+        if (!node) { container.innerHTML = '<p>节点不存在</p>'; return; }
+        if (node.isEnd) {
+            container.innerHTML = `<div class="node-box"><div class="node-title">✅ 结局节点配置</div>
+                <div class="form-group"><label>客户评级 (A/B/C/D)：</label><input type="text" id="edit_level" value="${node.level}"></div>
+                <div class="form-group"><label>判定依据：</label><input type="text" id="edit_reason" value="${node.reason}"></div>
+                <div class="form-group"><label>跟进建议：</label><input type="text" id="edit_action" value="${node.action}"></div>
+                <button class="btn-add" style="width:100%; padding:12px;" onclick="saveEndNode('${nodeId}')">保存结局配置</button></div>`;
+        } else {
+            var branchesHtml = '';
+            if (node.branches) {
+                node.branches.forEach(function(branch, i) {
+                    var options = ''; for(var k in flowData) options += `<option value="${k}" ${branch.target === k ? 'selected' : ''}>${k}</option>`;
+                    branchesHtml += `<div class="branch-item"><input type="text" value="${branch.text}" onchange="flowData['${nodeId}'].branches[${i}].text = this.value"><select onchange="flowData['${nodeId}'].branches[${i}].target = this.value">${options}</select><button class="del-branch" onclick="deleteBranch('${nodeId}', ${i})">删</button></div>`;
+                });
+            }
+            var factoryHtml = `<div class="form-group"><label>🔧 工厂版话术（可选，填写后客户类型选"工厂"时自动替换上面的话术）</label><textarea id="edit_text_factory" style="height:80px; background:#eff6ff; border-color:#93c5fd;" onchange="flowData['${nodeId}'].textFactory = this.value" placeholder="留空则工厂客户也使用上方默认话术...">${node.textFactory || ''}</textarea></div>`;
+            container.innerHTML = `<div class="node-box"><div class="node-title"><span>销售话术</span></div>
+                <div class="form-group"><label>对外话术（发给客户）</label><textarea id="edit_text" onchange="flowData['${nodeId}'].text = this.value">${node.text}</textarea></div>
+                <div class="form-group"><label>💡 销售提示（仅销售可见，不发给客户）</label><textarea id="edit_tip" style="height:80px; background:#fffbeb; border-color:#f59e0b;" onchange="flowData['${nodeId}'].tip = this.value" placeholder="填写谈判注意事项...">${node.tip || ''}</textarea></div>
+                ${factoryHtml}
+                <div class="node-title"><span>客户反应分支</span><button class="btn-add" style="margin:0; padding:6px 12px; font-size:12px;" onclick="addBranch('${nodeId}')">➕ 增加一条反应</button></div>
+                <div class="branch-list">${branchesHtml || '<p style="color:#94a3b8; font-size:13px;">暂无</p>'}</div></div>`;
+        }
+    }
+
+    function addNewNode() { var name = prompt("节点名称:"); if(!name) return; if(flowData[name]) { alert("已存在"); return; } flowData[name] = { text: "新话术...", tip: "", branches: [] }; renderTreeNav(); selectNode(name); }
+
+    function deleteNode(e, name) {
+        e.stopPropagation();
+        if(name === '开场白') { alert("不能删开场白"); return; }
+        if(confirm(`确定删除节点【${name}】吗？其他节点如果指向它，将会失效。`)) {
+            delete flowData[name];
+            for(var k in flowData) {
+                if(flowData[k].branches) {
+                    flowData[k].branches.forEach(b => { if(b.target === name) b.target = ''; });
+                }
+            }
+            renderTreeNav();
+            document.getElementById('editorContainer').innerHTML = '<p style="text-align:center; color:#94a3b8; margin-top:50px;">节点已删除</p>';
+        }
+    }
+
+    function addBranch(nodeId) { flowData[nodeId].branches.push({ text: "客户的新回应", target: "开场白" }); renderTreeNav(); selectNode(nodeId); }
+    function deleteBranch(nodeId, index) { flowData[nodeId].branches.splice(index, 1); renderTreeNav(); selectNode(nodeId); }
+    function saveEndNode(nodeId) { flowData[nodeId].level = document.getElementById('edit_level').value; flowData[nodeId].reason = document.getElementById('edit_reason').value; flowData[nodeId].action = document.getElementById('edit_action').value; alert("请点保存并生效"); }
+
+    function selectProvinceEditor() {
+        document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
+        document.getElementById('nav_prov').classList.add('active');
+        document.getElementById('editorHeader').innerText = "🌍 全国34省同行库管理";
+        var container = document.getElementById('editorContainer'); container.innerHTML = '';
+        var provHtml = `<div class="node-box"><div class="node-title">各省同行库 <span style="font-size:12px; font-weight:500; color:#94a3b8;">无本省数据自动调用邻省 / 顿号隔开</span></div><div class="prov-grid">`;
+        allProvinces.forEach(function(prov) {
+            var effective = getPeers(prov);
+            var hint = (realData[prov] && realData[prov].trim() !== '') ? '' : (effective ? '（调邻省）' : '（无数据）');
+            provHtml += `<div class="prov-item"><label>${prov} ${hint}：</label><input type="text" value="${provinceData[prov] || ''}" onchange="provinceData['${prov}'] = this.value" placeholder="输入同行..."></div>`;
+        });
+        provHtml += `</div></div>`; container.innerHTML = provHtml;
+    }
+
+    function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
+    function saveSettings() {
+        localStorage.setItem('ruizeFlowV34', JSON.stringify(flowData));
+        localStorage.setItem('ruizeProvV34', JSON.stringify(provinceData));
+        closeSettings(); alert("配置已保存！");
+    }
+
+    function startDrill() {
+        var surnames = ['王','李','张','刘','陈','杨','赵','周','吴','徐','孙','马'];
+        var comps = ['演练气体','沙盘气站','模拟制氧厂','测试制氮厂','随机气体','虚拟气站'];
+        var provs = ['山东','江苏','河北','广东','浙江','湖北','四川','河南','湖南'];
+        document.getElementById('clientSurname').value = surnames[Math.floor(Math.random()*surnames.length)];
+        document.getElementById('clientCompany').value = comps[Math.floor(Math.random()*comps.length)];
+        provSelect.value = provs[Math.floor(Math.random()*provs.length)];
+        document.getElementById('clientType').value = Math.random() > 0.5 ? '气站' : '工厂';
+        if (isCalling) { resetCall(); }
+        startCall();
+        showToast("🎭 演练模式启动：" + document.getElementById('clientCompany').value);
+    }
+
+    window.onload = function() { loadCRM(); };
+</script>
+</body>
+</html>
